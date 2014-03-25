@@ -24,3 +24,10 @@ void setGLViewport(Frame toSet){
 mat4 Frame_Ortho2D(Frame vpd){
 	return Ortho2D(vpd.L, vpd.R, vpd.B, vpd.T);
 }
+
+float getAspectRatio(Frame f){
+	return (f.R-f.L)/(f.T-f.B);
+}
+
+
+

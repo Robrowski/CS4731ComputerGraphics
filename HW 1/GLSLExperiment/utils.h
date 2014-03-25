@@ -84,7 +84,7 @@ void keyboard( unsigned char key, int x, int y );
 Frame newFrame(float L,	float R, float B,float T);
 void setGLViewport(Frame toSet);
 mat4 Frame_Ortho2D(Frame vpd);
-
+float getAspectRatio(Frame f);
 
 
 

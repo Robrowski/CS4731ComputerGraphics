@@ -123,21 +123,36 @@ void drawQuadrants(float X, float Y, float width, float height, int numRecursion
 	// Send transformation over to shader
 	ortho = Frame_Ortho2D(pic->f);
 	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
-	
+
+	// Check aspect ratio stuff, see lecture 4 
+	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
+	float w,h;
+	float aspectRatio = getAspectRatio(pic->f);
+	if (aspectRatio > width/height){
+		w = width;
+		h = width/aspectRatio;
+	} else if (aspectRatio < width/height){
+		w = height*aspectRatio;
+		h = height;
+	} else {
+		w = width;
+		h = height;
+	}
+
 
 	// Top Left = red
-	glViewport(X, Y + height/2, width/2, height/2);
+	glViewport(X, Y + h/2, w/2, h/2);
 	drawPicture(pic);
 	//gl_FragColor;
 
 
 	// Bottom left = blue
-	glViewport(X, Y, width/2, height/2);
+	glViewport(X, Y, w/2, h/2);
 	drawPicture(pic);
 
 
 	// Top right = green
-	glViewport(X + width/2, Y + height/2 ,width/2, height/2);
+	glViewport(X + w/2, Y + h/2 ,w/2, h/2);
 	drawPicture(pic);
 	
 	// Next iteration!
