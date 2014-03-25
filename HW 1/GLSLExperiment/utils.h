@@ -48,9 +48,9 @@ typedef struct {
 
 
 // Colors
-#define RED_VEC   vec(1.0, 0.0, 0.0, 1.0);
-#define GREEN_VEC vec(1.0, 0.0, 0.0, 1.0);
-#define BLUE_VEC  vec(1.0, 0.0, 0.0, 1.0);
+#define RED_VEC   vec4(1.0, 0.0, 0.0, 1.0);
+#define GREEN_VEC vec4(1.0, 0.0, 0.0, 1.0);
+#define BLUE_VEC  vec4(1.0, 0.0, 0.0, 1.0);
 
 
 // textfile.cpp

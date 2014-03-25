@@ -73,7 +73,7 @@ int findLastAst(char* text){
 		
 		// Indicates last asterisc
 		if (text[i] != '*' && lastA == i -1 && lastA > 0){
-			printf("Found lastA: %d\n",i);
+			//printf("Found lastA: %d\n",i);
 			return i + 1;		
 		}
 		
@@ -127,7 +127,7 @@ MyPicture* readPicture(FILE* f,unsigned int  GIVENnumPolyLines){
 	if (numPolyLines == 0){
 		if (sscanf(READ_NEXT_LINE, "%u", &numPolyLines) != 1) return NULL; // error
 	}
-	printf("Num Poly Lines: %d\n", numPolyLines);
+	//printf("Num Poly Lines: %d\n", numPolyLines);
 	
 	// A place to put all the poly lines
 	MyPicture* newPic = generateEmptyPicture(numPolyLines);
@@ -170,14 +170,14 @@ MyPicture* parseGRS( char *file ){
 	float L,T,R,B;
 	unsigned int numPolyLines = 0;
 	if (sscanf(extentHopefully, "%f %f %f %f", &L,&T,&R,&B) != 4){
-		printf("Default: ");
+		//printf("Default: ");
 		numPolyLines = (unsigned int)L; // assume first line was actually number of Polylines
 		L = DEFAULT_L;
 		T = DEFAULT_T;
 		R = DEFAULT_R;
      	B = DEFAULT_B;
 	}
-	printf("L T R B:  %f %f %f %f \n",L, T, R , B);	
+	//printf("L T R B:  %f %f %f %f \n",L, T, R , B);	
 		
 	MyPicture* newPic = readPicture(f,numPolyLines);
 	newPic->f = newFrame(L, R, B, T);

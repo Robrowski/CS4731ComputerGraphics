@@ -26,8 +26,7 @@ GLuint program;
 // Specifically for vertex shader and scaling
 mat4 ortho;
 GLint ProjLoc;
-vec4 gl_FragColor;
-
+GLint colorLoc;
 
 // Only used to set up buffers
 void initGPUBuffers( void )
@@ -55,10 +54,15 @@ void shaderSetup( void )
     glEnableVertexAttribArray( loc );
     glVertexAttribPointer( loc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 
-    glClearColor( 1.0, 1.0, 1.0, 1.0 );        // sets white as color used to clear screen
+	glClearColor( 1.0, 1.0, 1.0, 1.0 );        // sets white as color used to clear screen
 
 	// Setting world window shit
 	ProjLoc = glGetUniformLocation(program, "Proj");
+
+	// Getting the Fragment shader color vector
+	colorLoc = glGetUniformLocation( program, "fColor" );
+    glEnableVertexAttribArray( colorLoc );
+    glVertexAttribPointer( colorLoc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 }
 
 
@@ -115,19 +119,17 @@ MyPicture* readRandomPicture(void){
 
 
 void drawQuadrants(float X, float Y, float width, float height, int numRecursions){
-	if (numRecursions == 0) return; // Done!	
-	
 	// A Picture
 	MyPicture* pic =  readRandomPicture();
 	
 	// Send transformation over to shader
 	ortho = Frame_Ortho2D(pic->f);
-	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
+//	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
 
 	// Check aspect ratio stuff, see lecture 4 
 	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
-	float w,h;
-	float aspectRatio = getAspectRatio(pic->f);
+	int w,h;
+	int aspectRatio = getAspectRatio(pic->f);
 	if (aspectRatio > width/height){
 		w = width;
 		h = width/aspectRatio;
@@ -142,19 +144,30 @@ void drawQuadrants(float X, float Y, float width, float height, int numRecursion
 
 	// Top Left = red
 	glViewport(X, Y + h/2, w/2, h/2);
+
+	glUniform4f(colorLoc,1.0, 0.0, 0.0, 1.0);
 	drawPicture(pic);
-	//gl_FragColor;
+	
 
 
 	// Bottom left = blue
 	glViewport(X, Y, w/2, h/2);
+
 	drawPicture(pic);
 
 
 	// Top right = green
 	glViewport(X + w/2, Y + h/2 ,w/2, h/2);
+
 	drawPicture(pic);
 	
+	// If final iteration, place the thing in the corner in red
+	if (numRecursions == 1){
+		glViewport(X + w/2, Y, w/2, h/2);
+
+		drawPicture(pic);
+		return; // Done!
+	}// else
 	// Next iteration!
 	drawQuadrants(X + width/2, Y, width/2, height/2, numRecursions-1);
 }
@@ -167,7 +180,7 @@ void display( void )
 	// Start by clearing the window
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 10);
+	drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 3);
 
 	// THE FINAL STEP
     glFlush();			// force output to graphics hardware
@@ -191,11 +204,6 @@ int main( int argc, char **argv )
     initGPUBuffers( );							   // Create GPU buffers
     shaderSetup( );                                // Connect this .cpp file to shader file
 	
-
-	// Color?!!?
-	gl_FragColor = glGetUniformLocation(program, "gl_FragColor");
-	
-
 	// Calbacks
     glutDisplayFunc( display );                    // Register display callback function
     glutKeyboardFunc( keyboard );                  // Register keyboard callback function
