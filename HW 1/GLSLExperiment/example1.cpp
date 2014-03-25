@@ -67,7 +67,7 @@ void shaderSetup( void )
 
 
 void drawPicture(MyPicture *pic){
-	unsigned int lineNum;
+	int lineNum;
 	for (lineNum = 0; lineNum < pic->numLines; lineNum++){
 		// Because of what the pointer is in the MyPolyline Struct, can't actually get the size 
 		// of it because the compiler doesn't know that its a pointer to an array. The compiler
@@ -118,7 +118,7 @@ MyPicture* readRandomPicture(void){
 
 
 
-void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
+void drawQuadrants(float X, float Y, float width, float height, int numRecursions){
 	// A Picture
 	MyPicture* pic =  readRandomPicture();
 	
@@ -128,8 +128,8 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 
 	// Check aspect ratio stuff, see lecture 4 
 	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
-	int w,h;
-	int aspectRatio = getAspectRatio(pic->f);
+	float w,h;
+	float aspectRatio = getAspectRatio(pic->f);
 	if (aspectRatio > width/height){
 		w = width;
 		h = width/aspectRatio;
@@ -145,7 +145,7 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 	// Top Left = red
 	glViewport(X, Y + h/2, w/2, h/2);
 
-	glUniform4f(colorLoc,1.0, 0.0, 0.0, 1.0);
+//	glUniform4f(colorLoc,1.0, 0.0, 0.0, 1.0);
 	drawPicture(pic);
 	
 
@@ -181,6 +181,7 @@ void display( void )
 	glClear( GL_COLOR_BUFFER_BIT );
 
 	drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 3);
+
 
 	// THE FINAL STEP
     glFlush();			// force output to graphics hardware
