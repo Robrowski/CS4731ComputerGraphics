@@ -88,7 +88,7 @@ MyPicture* readRandomPicture(void){
 		file = "usa.dat";
 		break;
 	case 1:
-		file = "rex.dat";
+		file = "birdhead.dat";
 		break;
 	case 2:
 		file = "scene.dat";
@@ -106,7 +106,7 @@ MyPicture* readRandomPicture(void){
 		file = "house.dat";
 		break;
 	case 7:
-		file = "birdhead.dat";
+		file = "rex.dat";
 		break;
 	case 8:
 		file = "dino.dat";
@@ -118,13 +118,13 @@ MyPicture* readRandomPicture(void){
 
 
 
-void drawQuadrants(float X, float Y, float width, float height, int numRecursions){
+void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 	// A Picture
 	MyPicture* pic =  readRandomPicture();
 	
 	// Send transformation over to shader
 	ortho = Frame_Ortho2D(pic->f);
-//	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
+	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
 
 	// Check aspect ratio stuff, see lecture 4 
 	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
