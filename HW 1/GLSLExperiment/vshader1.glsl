@@ -1,9 +1,10 @@
 #version 150
 
-in vec4 vPosition;
+in  vec4 vPosition;
+uniform mat4 Proj;
 
 void
 main()
 {
-    gl_Position = vPosition;
+    gl_Position = Proj*vPosition;
 }

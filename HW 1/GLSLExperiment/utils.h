@@ -32,14 +32,16 @@ typedef struct {
 
 
 // Default world window
-#define WINDOW_WIDTH  640.0*2
-#define WINDOW_HEIGHT 480.0*2
+#define WINDOW_WIDTH  800 //640
+#define WINDOW_HEIGHT 800
+#define FIFTY_MILLION 50*1000*1000
+#define ONE_MILLION      1000*1000
 
 // CHECK THESE - defaults for reading in GRS files
 #define DEFAULT_L 0.0
-#define DEFAULT_T WINDOW_HEIGHT
+#define DEFAULT_T 640.0
 #define DEFAULT_R 0.0
-#define DEFAULT_B WINDOW_WIDTH
+#define DEFAULT_B 480.0
 
 
 // Vertex constants
@@ -48,9 +50,12 @@ typedef struct {
 
 
 // Colors
-#define RED_VEC   vec4(1.0, 0.0, 0.0, 1.0);
-#define GREEN_VEC vec4(1.0, 0.0, 0.0, 1.0);
-#define BLUE_VEC  vec4(1.0, 0.0, 0.0, 1.0);
+#define RED   1
+#define BLUE  2
+#define GREEN 3
+#define RED_VEC   vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN_VEC vec4(0.0, 1.0, 0.0, 1.0)
+#define BLUE_VEC  vec4(0.0, 0.0, 1.0, 1.0)
 
 
 // textfile.cpp
@@ -85,7 +90,7 @@ Frame newFrame(float L,	float R, float B,float T);
 void setGLViewport(Frame toSet);
 mat4 Frame_Ortho2D(Frame vpd);
 float getAspectRatio(Frame f);
-
+void sendOrthoToShader(Frame f);
 
 
 #endif // UTILS_H

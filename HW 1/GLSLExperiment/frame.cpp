@@ -1,8 +1,8 @@
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 
-
-
+extern GLuint program;
+extern GLint ProjLoc;
 
 
 // Make a new Frame
@@ -29,5 +29,7 @@ float getAspectRatio(Frame f){
 	return (f.R-f.L)/(f.T-f.B);
 }
 
-
-
+// Sends the given frame to the vertex shader
+void sendOrthoToShader(Frame f){
+	glUniformMatrix4fv(ProjLoc,1,GL_TRUE, Frame_Ortho2D(f));
+}

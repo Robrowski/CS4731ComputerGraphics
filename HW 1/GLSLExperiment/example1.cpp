@@ -24,9 +24,9 @@ using namespace std;
 GLuint program;
 
 // Specifically for vertex shader and scaling
-mat4 ortho;
 GLint ProjLoc;
 GLint colorLoc;
+
 
 // Only used to set up buffers
 void initGPUBuffers( void )
@@ -58,15 +58,10 @@ void shaderSetup( void )
 
 	// Setting world window shit
 	ProjLoc = glGetUniformLocation(program, "Proj");
-
-	// Getting the Fragment shader color vector
-	colorLoc = glGetUniformLocation( program, "fColor" );
-    glEnableVertexAttribArray( colorLoc );
-    glVertexAttribPointer( colorLoc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 }
 
 
-void drawPicture(MyPicture *pic){
+void drawMyPicture(MyPicture *pic, int lineType){
 	int lineNum;
 	for (lineNum = 0; lineNum < pic->numLines; lineNum++){
 		// Because of what the pointer is in the MyPolyline Struct, can't actually get the size 
@@ -75,15 +70,24 @@ void drawPicture(MyPicture *pic){
 		glBufferData( GL_ARRAY_BUFFER, (pic->pl[lineNum].NumPoints)*sizeof(MyPoint), pic->pl[lineNum].pt , GL_STATIC_DRAW );
 	
 		// All drawing happens in display function
-		glDrawArrays( GL_LINE_STRIP, 0, pic->pl[lineNum].NumPoints );    // draw the points
+		glDrawArrays( lineType, 0, pic->pl[lineNum].NumPoints );    // draw the points
 	}
 }
+
+
+void drawPicture(MyPicture *pic){
+	drawMyPicture( pic,GL_LINE_STRIP);
+}
+
+
+
+
 
 
 MyPicture* readRandomPicture(void){
 	char* file;
 	
-	switch( rand() % 8){
+	switch( rand() % 9){
 	case 0:
 		file = "usa.dat";
 		break;
@@ -117,18 +121,23 @@ MyPicture* readRandomPicture(void){
 }
 
 
+void setLineColor(vec4 toSet){
+	glUniform4fv( glGetUniformLocation(program, "fragmentShaderLineColor"),1, toSet );
+}
 
-void drawQuadrants(float X, float Y, float width, float height, int numRecursions){
+
+
+void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 	// A Picture
 	MyPicture* pic =  readRandomPicture();
 	
 	// Send transformation over to shader
-	ortho = Frame_Ortho2D(pic->f);
-	glUniformMatrix4fv(ProjLoc,1,GL_TRUE,ortho);
+	// **** MOVE THIS TO DRAW PICTURE
+	sendOrthoToShader(pic->f);
 
 	// Check aspect ratio stuff, see lecture 4 
 	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
-	float w,h;
+	int w,h;
 	float aspectRatio = getAspectRatio(pic->f);
 	if (aspectRatio > width/height){
 		w = width;
@@ -143,28 +152,25 @@ void drawQuadrants(float X, float Y, float width, float height, int numRecursion
 
 
 	// Top Left = red
-	glViewport(X, Y + h/2, w/2, h/2);
-
-//	glUniform4f(colorLoc,1.0, 0.0, 0.0, 1.0);
+	glViewport(X, Y + height/2, w/2, h/2);
+	setLineColor(RED_VEC);
 	drawPicture(pic);
-	
-
 
 	// Bottom left = blue
 	glViewport(X, Y, w/2, h/2);
-
+	setLineColor(BLUE_VEC);
 	drawPicture(pic);
 
 
 	// Top right = green
-	glViewport(X + w/2, Y + h/2 ,w/2, h/2);
-
+	glViewport(X + width/2, Y + height/2 ,w/2, h/2);
+	setLineColor(GREEN_VEC);
 	drawPicture(pic);
 	
 	// If final iteration, place the thing in the corner in red
 	if (numRecursions == 1){
-		glViewport(X + w/2, Y, w/2, h/2);
-
+		glViewport(X + width/2, Y, w/2, h/2);
+		setLineColor(RED_VEC);
 		drawPicture(pic);
 		return; // Done!
 	}// else
@@ -174,14 +180,61 @@ void drawQuadrants(float X, float Y, float width, float height, int numRecursion
 
 
 
+float a[] = {	0.0f,	0.2f,	-0.15f,	0.85f};
+float b[] = {	0.0f,	0.23f,	0.26f ,	-0.04f };
+float c[] = {	0.0f,	-0.26f,	0.28f ,	0.04f };
+float d[] = {	0.16f,	0.22f,	0.24f ,	0.85f };
+float tx[] = {  0.0f,	0.0f,	0.0f ,	0.0f };
+float ty[] = {  0.0f,	1.6f,	0.44f ,	1.6f };
+
+
+/** Take the number of iterations and draw the fern for that many points */
+void drawFern(int iterations){
+	// Going to make a picture out of it!
+	MyPicture* fernPic = generateEmptyPicture(1);
+	fernPic->pl = generateEmptyPolyline(iterations);
+	MyPoint* pt = fernPic->pl->pt; // array of points in MyPolyline
+	fernPic->f = newFrame(0,0,0,0);// Initially...
+
+	// Initial point
+	pt->x = 0.0;
+	pt->y = 0.0;
+
+	// Generate the points
+	int iter, chosenIndex;
+	for (iter = 1; iter < iterations; iter++){
+		int rNum = (rand()%100) + 1; // Random number from 1 to 100
+		if (rNum <= 85) chosenIndex = 3;      // 85%
+		else if (rNum <= 92) chosenIndex = 2; //  7%
+		else if (rNum <= 99) chosenIndex = 1; //  7%
+		else				 chosenIndex = 0; //  1%
+
+		pt[iter].x =  a[chosenIndex] * pt[iter-1].x + c[chosenIndex] * pt[iter-1].y + tx[chosenIndex];
+		pt[iter].y =  b[chosenIndex] * pt[iter-1].x + d[chosenIndex] * pt[iter-1].y + ty[chosenIndex];
+	
+		// Check for edges of world space
+		if (pt[iter].x > fernPic->f.R) fernPic->f.R = pt[iter].x;
+		if (pt[iter].x < fernPic->f.L) fernPic->f.L = pt[iter].x;
+		if (pt[iter].y > fernPic->f.T) fernPic->f.T = pt[iter].y;
+	}
+	
+	setLineColor(GREEN_VEC);
+	sendOrthoToShader(fernPic->f);
+	drawMyPicture(fernPic, GL_POINTS);
+}
+
+
+
+
+
 
 void display( void )
 {
 	// Start by clearing the window
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 3);
-
+	//drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 10);
+	drawFern(ONE_MILLION); 
 
 	// THE FINAL STEP
     glFlush();			// force output to graphics hardware
