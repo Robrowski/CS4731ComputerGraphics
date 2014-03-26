@@ -163,7 +163,13 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 }
 
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%*//*%%%%%%%%%%%%%%%%%%%%%%%%%*/
+/** These two functions have the potential to be made into a "framework"
+class that gets extended and such with two functions to fill in
+- init variables
+- calculate points
 
+*/
 float a[] = {	0.0f,	0.2f,	-0.15f,	0.85f};
 float b[] = {	0.0f,	0.23f,	0.26f ,	-0.04f };
 float c[] = {	0.0f,	-0.26f,	0.28f ,	0.04f };
@@ -209,9 +215,69 @@ void drawFern(int iterations){
 	free(fernPic);
 }
 
+/** Take the number of iterations and draw the fern for that many points */
+void drawGingerBreadMan(int iterations){
+	// Going to make a picture out of it!
+	MyPicture* gingerPic = generateEmptyPicture(1);
+	gingerPic->pl = generateEmptyPolyline(iterations);
+	MyPoint* pt = gingerPic->pl->pt; // array of points in MyPolyline
+	gingerPic->f = newFrame(0,0,0,0);// Initially...
+
+	// Initial point
+	pt->x = 0;
+	pt->y = 0;
+
+	//Constants
+	const int M = 40;
+	const int L = 3;
+
+	// Generate the points
+	int iter, chosenIndex;
+	for (iter = 1; iter < iterations; iter++){
+		pt[iter].x =  M*(1 + 2L) - pt[iter - 1].y + abs(pt[iter-1].x - L*M);
+		pt[iter].y =  pt[iter - 1].x;
+
+
+		// Check for edges of world space
+		if (pt[iter].x > gingerPic->f.R) gingerPic->f.R = pt[iter].x;
+		if (pt[iter].x < gingerPic->f.L) gingerPic->f.L = pt[iter].x;
+		if (pt[iter].y > gingerPic->f.T) gingerPic->f.T = pt[iter].y;
+		if (pt[iter].y < gingerPic->f.T) gingerPic->f.B = pt[iter].y;
+
+	}
+	 
+	setLineColor(BLUE_VEC);
+	sendOrthoToShader(gingerPic->f);
+	setViewPort(0, 0 , WINDOW_WIDTH, WINDOW_HEIGHT, gingerPic->f);
+	drawMyPicture(gingerPic, GL_POINTS);
+	free(gingerPic);
+}
+
+void drawSierpinski(void ){
+	const int NumPoints = 100000;
+	vec2 points[NumPoints];
+	// Specifiy the vertices for a triangle
+	vec2 vertices[3] = {vec2( -1.0, -1.0 ), vec2( 0.0, 1.0 ), vec2( 1.0, -1.0 )};
+	// An arbitrary initial point inside the triangle
+	points[0] = point2(0.25, 0.50);
+	// compute and store N-1 new points
+	for ( int i = 1; i < NumPoints; ++i ) {
+		int j = rand() % 3; // pick a vertex at random
+		// Compute the point halfway between the selected vertex
+		// and the previous point
+		points[i] = ( points[i - 1] + vertices[j] ) / 2.0;
+	}
+
+	setGLViewport(DEFAULT_WORLD_FRAME);
+	sendOrthoToShader(newFrame(-1,1, -1,1  ));
+	// Send off data and draw it
+	glBufferData( GL_ARRAY_BUFFER, sizeof(points), points , GL_STATIC_DRAW );
+	glDrawArrays( GL_POINTS, 0, NumPoints);    // draw
+}
 
 
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%*/
 void display( void )
 {
 	// Start by clearing the window

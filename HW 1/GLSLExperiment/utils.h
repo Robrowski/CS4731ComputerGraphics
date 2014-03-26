@@ -86,6 +86,7 @@ void keyboard( unsigned char key, int x, int y );
 
 
 // frame.cpp
+#define DEFAULT_WORLD_FRAME newFrame(0,  WINDOW_WIDTH , 0,WINDOW_HEIGHT )
 Frame newFrame(float L,	float R, float B,float T);
 void setGLViewport(Frame toSet);
 mat4 Frame_Ortho2D(Frame vpd);
@@ -98,8 +99,8 @@ void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame);
 // example1.cpp - to be moved...
 void drawFern(int iterations);
 void drawQuadrants(int X, int Y, int width, int height, int numRecursions);
-
-
+void drawGingerBreadMan(int iterations);
+void drawSierpinski(void );
 
 
 

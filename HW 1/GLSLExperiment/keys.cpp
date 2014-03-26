@@ -33,17 +33,15 @@ void keyboard( unsigned char key, int x, int y )
 		if (currentIteration < 1) currentIteration = 1;
 		drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, currentIteration);
 		break;
+	case 'g':
+		drawGingerBreadMan(ONE_MILLION);
+		break;
+	case 's':
+		drawSierpinski();
+		break;
 	}
 	
 
 	// THE FINAL STEP
     glFlush();	
-
-
-
-
-
-
-
-
 }
