@@ -126,10 +126,9 @@ void setLineColor(vec4 toSet){
 }
 
 
-
-void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
+void drawQuadrants(int X, int Y, int width, int height, int numRecursions, MyPicture pics[], int iterationNumber){
 	// A Picture
-	MyPicture* pic =  readRandomPicture();
+	MyPicture *pic = &pics[iterationNumber];
 	
 	// Send transformation over to shader
 	// **** MOVE THIS TO DRAW PICTURE
@@ -158,9 +157,49 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 		return; // Done!
 	}// else
 	// Next iteration!
-	drawQuadrants(X + width/2, Y, width/2, height/2, numRecursions-1);
-	free(pic);
+	drawQuadrants(X + width/2, Y, width/2, height/2, numRecursions-1, pics, iterationNumber + 1);
 }
+
+
+/**  // OLD VERSION
+MyPicture* drawQuadrants(int X, int Y, int width, int height, int numRecursions){
+	// A Picture
+	MyPicture* pic =  readRandomPicture();
+	
+	// Send transformation over to shader
+	// **** MOVE THIS TO DRAW PICTURE
+	sendOrthoToShader(pic->f);
+	
+	// Top Left = red
+	setViewPort(X, Y + height/2, width/2, height/2, pic->f);
+	setLineColor(RED_VEC);
+	drawPicture(pic);
+
+	// Bottom left = blue
+	setViewPort(X, Y, width/2, height/2, pic->f);
+	setLineColor(BLUE_VEC);
+	drawPicture(pic);
+
+	// Top right = green
+	setViewPort(X + width/2, Y + height/2 ,width/2, height/2,pic->f);
+	setLineColor(GREEN_VEC);
+	drawPicture(pic);
+	
+	// If final iteration, place the thing in the corner in red
+	if (numRecursions == 1){
+		setViewPort(X + width/2, Y, width/2, height/2, pic->f);
+		setLineColor(RED_VEC);
+		drawPicture(pic);
+		return pic; // Done!
+	}// else
+	// Next iteration!
+	drawQuadrants(X + width/2, Y, width/2, height/2, numRecursions-1);
+	return pic;
+}
+
+*/
+
+
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%*//*%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -268,6 +307,7 @@ void drawSierpinski(void ){
 		points[i] = ( points[i - 1] + vertices[j] ) / 2.0;
 	}
 
+	setLineColor(RED_VEC);
 	setGLViewport(DEFAULT_WORLD_FRAME);
 	sendOrthoToShader(newFrame(-1,1, -1,1  ));
 	// Send off data and draw it

@@ -98,11 +98,11 @@ void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame);
 
 // example1.cpp - to be moved...
 void drawFern(int iterations);
-void drawQuadrants(int X, int Y, int width, int height, int numRecursions);
+//MyPicture* drawQuadrants(int X, int Y, int width, int height, int numRecursions);
 void drawGingerBreadMan(int iterations);
-void drawSierpinski(void );
-
-
+void drawSierpinski(void);
+MyPicture* readRandomPicture(void);
+void drawQuadrants(int X, int Y, int width, int height, int numRecursions,MyPicture pics[], int iterationNumber);
 
 
 
