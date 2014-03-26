@@ -181,7 +181,7 @@ MyPicture* parseGRS( char *file ){
 		
 	MyPicture* newPic = readPicture(f,numPolyLines);
 	newPic->f = newFrame(L, R, B, T);
-
+	fclose(f);// done with that file
 	return newPic;
 }
 

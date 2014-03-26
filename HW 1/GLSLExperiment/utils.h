@@ -91,6 +91,19 @@ void setGLViewport(Frame toSet);
 mat4 Frame_Ortho2D(Frame vpd);
 float getAspectRatio(Frame f);
 void sendOrthoToShader(Frame f);
+void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame);
+
+
+
+// example1.cpp - to be moved...
+void drawFern(int iterations);
+void drawQuadrants(int X, int Y, int width, int height, int numRecursions);
+
+
+
+
+
+
 
 
 #endif // UTILS_H

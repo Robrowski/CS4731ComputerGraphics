@@ -134,48 +134,32 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions){
 	// Send transformation over to shader
 	// **** MOVE THIS TO DRAW PICTURE
 	sendOrthoToShader(pic->f);
-
-	// Check aspect ratio stuff, see lecture 4 
-	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
-	int w,h;
-	float aspectRatio = getAspectRatio(pic->f);
-	if (aspectRatio > width/height){
-		w = width;
-		h = width/aspectRatio;
-	} else if (aspectRatio < width/height){
-		w = height*aspectRatio;
-		h = height;
-	} else {
-		w = width;
-		h = height;
-	}
-
-
+	
 	// Top Left = red
-	glViewport(X, Y + height/2, w/2, h/2);
+	setViewPort(X, Y + height/2, width/2, height/2, pic->f);
 	setLineColor(RED_VEC);
 	drawPicture(pic);
 
 	// Bottom left = blue
-	glViewport(X, Y, w/2, h/2);
+	setViewPort(X, Y, width/2, height/2, pic->f);
 	setLineColor(BLUE_VEC);
 	drawPicture(pic);
 
-
 	// Top right = green
-	glViewport(X + width/2, Y + height/2 ,w/2, h/2);
+	setViewPort(X + width/2, Y + height/2 ,width/2, height/2,pic->f);
 	setLineColor(GREEN_VEC);
 	drawPicture(pic);
 	
 	// If final iteration, place the thing in the corner in red
 	if (numRecursions == 1){
-		glViewport(X + width/2, Y, w/2, h/2);
+		setViewPort(X + width/2, Y, width/2, height/2, pic->f);
 		setLineColor(RED_VEC);
 		drawPicture(pic);
 		return; // Done!
 	}// else
 	// Next iteration!
 	drawQuadrants(X + width/2, Y, width/2, height/2, numRecursions-1);
+	free(pic);
 }
 
 
@@ -220,10 +204,10 @@ void drawFern(int iterations){
 	
 	setLineColor(GREEN_VEC);
 	sendOrthoToShader(fernPic->f);
+	setViewPort(0, 0 , WINDOW_WIDTH, WINDOW_HEIGHT, fernPic->f);
 	drawMyPicture(fernPic, GL_POINTS);
+	free(fernPic);
 }
-
-
 
 
 
@@ -233,7 +217,7 @@ void display( void )
 	// Start by clearing the window
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	//drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 10);
+	//drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 3);
 	drawFern(ONE_MILLION); 
 
 	// THE FINAL STEP

@@ -25,11 +25,34 @@ mat4 Frame_Ortho2D(Frame vpd){
 	return Ortho2D(vpd.L, vpd.R, vpd.B, vpd.T);
 }
 
-float getAspectRatio(Frame f){
-	return (f.R-f.L)/(f.T-f.B);
-}
 
 // Sends the given frame to the vertex shader
 void sendOrthoToShader(Frame f){
 	glUniformMatrix4fv(ProjLoc,1,GL_TRUE, Frame_Ortho2D(f));
+}
+
+// Calculate the aspect ratio based on the given frame
+float getAspectRatio(Frame f){
+	return (f.R-f.L)/(f.T-f.B);
+}
+
+// Sets the view port AND handles aspect ratio!
+void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame){
+	
+	// Check aspect ratio stuff, see lecture 4 
+	// http://web.cs.wpi.edu/~emmanuel/courses/cs4731/D14/slides/lecture04.pdf 
+	int w,h;
+	float aspectRatio = getAspectRatio(wFrame);
+	if (aspectRatio > vpWidth/vpHeight){
+		w = vpWidth;
+		h = vpWidth/aspectRatio;
+	} else if (aspectRatio < vpWidth/vpHeight){
+		w = vpHeight*aspectRatio;
+		h = vpHeight;
+	} else {
+		w = vpWidth;
+		h = vpHeight;
+	}
+
+	glViewport(X , Y , w, h);
 }
