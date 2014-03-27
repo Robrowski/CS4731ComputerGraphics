@@ -17,9 +17,9 @@ MyPolyline* generateTriangle(void){
 	MyPolyline* newPoints = generateEmptyPolyline(NUM_VERTICES_TRI);
 	
 	// Pre defined points
-	newPoints->pt[0] =  MyPoint( -0.5, -0.5 );
-	newPoints->pt[1] =  MyPoint( 0.0, 0.5 );
-	newPoints->pt[2] =	MyPoint( 0.5, -1.0 );
+	newPoints->pt[0] =  MyPoint( -0.5f, -0.5f );
+	newPoints->pt[1] =  MyPoint(  0.0f,  0.5f  );
+	newPoints->pt[2] =	MyPoint(  0.5f, -1.0f );
 	
 	return newPoints;
 }
@@ -35,8 +35,6 @@ MyPolyline* generatePentagon(void){
 	newPoints->pt[2] =  MyPoint( 0.0, 0.5 );
 	newPoints->pt[3] =	MyPoint( 0.56, 0.13);
 	newPoints->pt[4] =	MyPoint( 0.3, -0.5 );
-	
-	
 
 	return newPoints;
 }

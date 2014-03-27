@@ -2,21 +2,28 @@
 #include "Angel.h"
 #include "utils.h"
 
-int currentIteration = 1;
+int currentIteration = 0;
 
-#define MAX_ITERATIONS 10
+#define MAX_ITERATIONS 9
 MyPicture pics[MAX_ITERATIONS + 1]; // + 1 for simplified array indexing + laziness
 
 void keyboard( unsigned char key, int x, int y )
 {
+	// Init step
+	if (currentIteration == 0){
+		currentIteration = 1;
+		pics [currentIteration] = *readRandomPicture();
+	}
+
 	// Start by clearing the window
 	glClear( GL_COLOR_BUFFER_BIT );
 
     switch ( key ) {
 	
 	case 'm':
-		pics [1] = *readRandomPicture();
-		drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, 1, pics, 1);
+		currentIteration = 1;
+		pics [currentIteration] = *readRandomPicture();
+		drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, currentIteration, pics, 1);
 		break;
 	case 'p':
 		// Pick a new random pic for this iteration
@@ -32,8 +39,6 @@ void keyboard( unsigned char key, int x, int y )
 			
 		drawQuadrants(0,0,WINDOW_WIDTH, WINDOW_HEIGHT, currentIteration, pics, 1);
 		break;
-
-
 	case 'g':
 		drawGingerBreadMan(ONE_MILLION);
 		break;

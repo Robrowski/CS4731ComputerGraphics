@@ -81,18 +81,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="example1.cpp" />
+    <ClCompile Include="color.cpp" />
+    <ClCompile Include="draw.cpp" />
+    <ClCompile Include="GRS.cpp" />
+    <ClCompile Include="hw1.cpp" />
     <ClCompile Include="frame.cpp" />
     <ClCompile Include="geometries.cpp" />
+    <ClCompile Include="hw2.cpp" />
     <ClCompile Include="keys.cpp" />
-    <ClCompile Include="mainInits.cpp" />
+    <ClCompile Include="init.cpp" />
     <ClCompile Include="InitShader.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyPicture.cpp" />
     <ClCompile Include="MyPolyline.cpp" />
     <ClCompile Include="textfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Angel.h" />
     <ClInclude Include="CheckError.h" />
+    <ClInclude Include="homework.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="textfile.h" />
     <ClInclude Include="utils.h" />

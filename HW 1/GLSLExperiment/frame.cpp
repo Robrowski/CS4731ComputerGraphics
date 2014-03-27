@@ -1,11 +1,18 @@
+/** This file contains utilies for functions utilizing the "Frame" struct. Inncluded are
+aspect ratio calculations and viewport setting helpers. 
+
+
+Eventually frames will be abstracted into a class and be more useful! 
+
+*/
+
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 
-extern GLuint program;
-extern GLint ProjLoc;
-
 
 // Make a new Frame
+//TODO: make a constructor to take origin X, origin y, width, height format 
+// and abstract it away
 Frame newFrame(float L,	float R, float B,float T){
 	Frame newVPD;
 	newVPD.L = L;

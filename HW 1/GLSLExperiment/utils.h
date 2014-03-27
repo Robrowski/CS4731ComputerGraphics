@@ -18,7 +18,6 @@ typedef struct {
 struct MyPolyline{
 	int NumPoints;
 	MyPoint* pt; // Pointer to c-allocated array
-	struct MyPolyline* prev;
 } ;
 typedef struct MyPolyline MyPolyline;
 
@@ -29,7 +28,10 @@ typedef struct {
 	Frame f;
 } MyPicture;
 
-
+// Program locations
+extern GLuint program;
+extern GLint ProjLoc;
+extern GLint colorLoc;
 
 // Default world window
 #define WINDOW_WIDTH  800 //640
@@ -62,17 +64,21 @@ typedef struct {
 char *textFileRead(char *fn) ;
 int textFileWrite(char *fn, char *s) ;
 
-// mainInits.cpp
+// init.cpp
 void genericInit( int argc, char **argv );
-
+void initGPUBuffers( void );
+void shaderSetup( void );
 
 // MyPolyline.cpp
 MyPolyline* generateEmptyPolyline(int size);
 MyPicture* generateEmptyPicture(int numPolyLines);
 void copyPolyline(MyPolyline* src, MyPolyline* dst);
 void printPolyline(MyPolyline* toPrint);
-MyPicture* parseGRS( char *file );
+void drawMyPolyline(MyPolyline ln, GLint lineType);
 
+// MyPicture.cpp
+void drawPicture(MyPicture *pic);
+void drawMyPicture(MyPicture *pic, GLint lineType);
 
 // geometries.cpp
 MyPolyline* generateTriangle(void);
@@ -82,7 +88,8 @@ MyPolyline* generatePentagon(void);
 // keys.cpp
 void keyboard( unsigned char key, int x, int y );
 
-
+// color.cpp
+void setLineColor(vec4 toSet);
 
 
 // frame.cpp
@@ -95,14 +102,22 @@ void sendOrthoToShader(Frame f);
 void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame);
 
 
+// GRS.cpp
+MyPicture* readRandomPicture(void);
+MyPicture* parseGRS( char *file );
 
-// example1.cpp - to be moved...
+
+
+// draw.cpp
 void drawFern(int iterations);
-//MyPicture* drawQuadrants(int X, int Y, int width, int height, int numRecursions);
 void drawGingerBreadMan(int iterations);
 void drawSierpinski(void);
-MyPicture* readRandomPicture(void);
+
+
+// hw1.cpp
 void drawQuadrants(int X, int Y, int width, int height, int numRecursions,MyPicture pics[], int iterationNumber);
+
+
 
 
 
