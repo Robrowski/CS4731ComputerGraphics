@@ -17,6 +17,12 @@
       <UniqueIdentifier>{cc841252-f9ed-45bb-b857-252965175af6}</UniqueIdentifier>
       <Extensions>*.dat;cpp</Extensions>
     </Filter>
+    <Filter Include="Source Files\Homework">
+      <UniqueIdentifier>{29f17bb4-b222-4588-b572-3669a0ed38ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Abstractions">
+      <UniqueIdentifier>{c03ad1e4-ebe0-411b-9c7a-4639718547b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="textfile.cpp">
@@ -28,13 +34,7 @@
     <ClCompile Include="geometries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyPolyline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="keys.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="frame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="color.cpp">
@@ -46,20 +46,26 @@
     <ClCompile Include="GRS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyPicture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hw1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hw2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Homework</Filter>
+    </ClCompile>
+    <ClCompile Include="hw1.cpp">
+      <Filter>Source Files\Homework</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPicture.cpp">
+      <Filter>Source Files\Abstractions</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPolyline.cpp">
+      <Filter>Source Files\Abstractions</Filter>
+    </ClCompile>
+    <ClCompile Include="frame.cpp">
+      <Filter>Source Files\Abstractions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
