@@ -42,7 +42,7 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions, MyPic
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%*/
-void display( void )
+void display1( void )
 {
 	// Start by clearing the window
 	glClear( GL_COLOR_BUFFER_BIT );
@@ -50,8 +50,8 @@ void display( void )
 
 	drawFern(ONE_MILLION); 
 
-	// THE FINAL STEP
-    glFlush();			// force output to graphics hardware
+
+	glutSwapBuffers();
 }
 
 
@@ -62,11 +62,14 @@ void display( void )
 int HW1( int argc, char **argv )
 {
 	// main function: program starts here
-	genericInit(argc, argv);
+	genericInit(argc, argv, "HOMEWORK 1");
+	initGPUBuffers1();
+	shaderSetup1();
+
 
 	// Calbacks
-    glutDisplayFunc( display );                    // Register display callback function
-    glutKeyboardFunc( keyboard );                  // Register keyboard callback function
+    glutDisplayFunc( display1 );                    // Register display callback function
+    glutKeyboardFunc( keyboard1 );                  // Register keyboard callback function
 
 	// Can add minimalist menus here
 	// add mouse handler

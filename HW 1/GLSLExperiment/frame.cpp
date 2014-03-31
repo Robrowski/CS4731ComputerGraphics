@@ -35,6 +35,7 @@ mat4 Frame_Ortho2D(Frame vpd){
 
 // Sends the given frame to the vertex shader
 void sendOrthoToShader(Frame f){
+	// Should this be GL_TRUE or false?
 	glUniformMatrix4fv(ProjLoc,1,GL_TRUE, Frame_Ortho2D(f));
 }
 

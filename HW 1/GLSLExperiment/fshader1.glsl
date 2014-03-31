@@ -1,12 +1,13 @@
 #version 150
 
-out vec4  fColor; // works
-
 
 uniform vec4 fragmentShaderLineColor;
+in  vec4  interpolatedColor;
+out vec4  fColor;
 
-void
-main()
-{
-    fColor = fragmentShaderLineColor;
-}
+void main() 
+{ 
+	//  fColor = fragmentShaderLineColor;
+    fColor = interpolatedColor;
+} 
+

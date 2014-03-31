@@ -12,24 +12,25 @@ GLint colorLoc;
 
 
 /** Basic inits for the general case */
-void genericInit( int argc, char **argv ){
-	glutInit( &argc, argv );                       // intialize GLUT  
-    glutInitDisplayMode( GLUT_SINGLE | GLUT_RGB ); // single framebuffer, colors in RGB
+void genericInit( int argc, char **argv, char* window){
+    glutInit( &argc, argv );
+    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( WINDOW_WIDTH, WINDOW_HEIGHT );                // Window size: 640 wide X 480 high
 	glutInitWindowPosition(100,5);               // Top left corner at (100, 50)
-    glutCreateWindow( "CS 4731: HW1     Robert Dabrowski" );            // Create Window
+    glutCreateWindow( window );            // Create Window
 
     glewInit();		// init glew
 
-	initGPUBuffers();
-	shaderSetup();
 	
 	// General Stuff
 	srand(time(NULL)); // Set random number seed
+
+
+
 }
 
 // Only used to set up buffers
-void initGPUBuffers( void )
+void initGPUBuffers1( void )
 {
 	// Create a vertex array object
 	GLuint vao;
@@ -43,19 +44,29 @@ void initGPUBuffers( void )
 }
 
 
-void shaderSetup( void )
+void shaderSetup1( void )
 {
 	// Load shaders and use the resulting shader program
     program = InitShader( "vshader1.glsl", "fshader1.glsl" );
     glUseProgram( program );
 
     // Initialize the vertex position attribute from the vertex shader
-    GLuint loc = glGetAttribLocation( program, "vPosition" );
-    glEnableVertexAttribArray( loc );
-    glVertexAttribPointer( loc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( vPosition );
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0) );
+
 
 	glClearColor( 1.0, 1.0, 1.0, 1.0 );        // sets white as color used to clear screen
 
 	// Setting world window shit
 	ProjLoc = glGetUniformLocation(program, "Proj");
+
+
+	// Default model matrix
+	GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
+	glUniformMatrix4fv( modelMatrix, 1, GL_FALSE, mat4(1) );
+
+	// Default color
+	setLineColor(RED_VEC);
+
 }

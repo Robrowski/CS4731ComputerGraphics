@@ -94,6 +94,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyPicture.cpp" />
     <ClCompile Include="MyPolyline.cpp" />
+    <ClCompile Include="shaderUtils.cpp" />
     <ClCompile Include="textfile.cpp" />
   </ItemGroup>
   <ItemGroup>

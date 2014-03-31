@@ -7,7 +7,7 @@ int currentIteration = 0;
 #define MAX_ITERATIONS 9
 MyPicture pics[MAX_ITERATIONS + 1]; // + 1 for simplified array indexing + laziness
 
-void keyboard( unsigned char key, int x, int y )
+void keyboard1( unsigned char key, int x, int y )
 {
 	// Init step
 	if (currentIteration == 0){
@@ -61,11 +61,9 @@ void keyboard( unsigned char key, int x, int y )
         exit(1);		// quit program
         break;
 
-
-
 	}
 	
 
-	// THE FINAL STEP
-    glFlush();	
+
+	glutSwapBuffers();
 }

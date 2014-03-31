@@ -52,9 +52,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hw2.cpp">
-      <Filter>Source Files\Homework</Filter>
-    </ClCompile>
     <ClCompile Include="hw1.cpp">
       <Filter>Source Files\Homework</Filter>
     </ClCompile>
@@ -66,6 +63,12 @@
     </ClCompile>
     <ClCompile Include="frame.cpp">
       <Filter>Source Files\Abstractions</Filter>
+    </ClCompile>
+    <ClCompile Include="hw2.cpp">
+      <Filter>Source Files\Homework</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
