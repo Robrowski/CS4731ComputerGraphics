@@ -4,7 +4,7 @@
 
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
-//#include <stdlib.h>
+#include <stdlib.h>
 
 //----------------------------------------------------------------------------
 int width = WINDOW_WIDTH;
@@ -58,18 +58,36 @@ color4 vertex_colors[8] = {
 int Index = 0;
 void quad( int a, int b, int c, int d )
 {
-    colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-    colors[Index] = vertex_colors[b]; points[Index] = vertices[b]; Index++;
-    colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-    colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-    colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-    colors[Index] = vertex_colors[d]; points[Index] = vertices[d]; Index++;
+    points[Index] = vertices[a]; Index++;
+    points[Index] = vertices[b]; Index++;
+    points[Index] = vertices[c]; Index++;
+    points[Index] = vertices[a]; Index++;
+    points[Index] = vertices[c]; Index++;
+    points[Index] = vertices[d]; Index++;
 }
+
+void assignColorsRandomly(int numberOfVertices){
+	int i;
+	for (i = 0; i < numberOfVertices; i++){
+		colors[i] = vertex_colors[rand()%8];
+	}
+}
+
+void assignColorsRed(int numberOfVertices){
+	int i;
+	for (i = 0; i < numberOfVertices; i++){
+		colors[i] = RED_VEC;
+	}
+}
+
+
 
 // generate 12 triangles: 36 vertices and 36 colors
 void colorcube()
 {
-    quad( 1, 0, 3, 2 );
+    assignColorsRandomly(NumVertices);
+//	assignColorsRed(NumVertices);
+	quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
     quad( 6, 5, 1, 2 );
@@ -132,7 +150,7 @@ void drawCube(void)
 	// the depth is disabled after the draw 
 	// in case you need to draw overlays
 	glEnable( GL_DEPTH_TEST );
-    glDrawArrays( GL_TRIANGLES, 0, NumVertices );
+    glDrawArrays( GL_TRIANGLES, 0, NumVertices ); // = Num triangles * 3
 	glDisable( GL_DEPTH_TEST ); 
 }
 
@@ -161,11 +179,8 @@ void display( void )
 	// used to generate images or other information, they support interface to OpenGL
 	// http://www.khronos.org/registry/cl/
 
-	// TIP3: prototype your operations in Matlab or Mathematica first to verify correct behavior
-	// both programs support some sort of runtime interface to C++ programs
 
-	// TIP4: check your graphics specs. you have a limited number of loop iterations, storage, registers, texture space etc.
-	
+
 	// TIP5: take a look at the "Assembly" generated from the opengl compilers, it might lead you to some optimizations
 	// http://http.developer.nvidia.com/Cg/cgc.html
 
@@ -191,8 +206,6 @@ void display( void )
 	// also scale your objects appropriatly, dont use scales at the upper or lower bounds
 	// of floating point precision
 
-	// WARNING1: I believe Angel::transpose(...) does not transpose a mat4, but just returns
-	// an identical matrix, can anyone verify this?
 
 
 	// set up projection matricies
@@ -210,7 +223,7 @@ void display( void )
 
 
 void initCTM(void){
-	// Probably dependent on the picture
+/*	// Probably dependent on the picture
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)45.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 100.0);
 
 	// arbitrary transformations
@@ -220,6 +233,11 @@ void initCTM(void){
 
 	nextTransform = Angel::identity();
 	CTM = perspectiveMat*modelMat;
+
+	// could be good stuff for setting up PLY files intitially
+	*/
+
+	CTM = Angel::identity();
 }
 
 
@@ -229,59 +247,129 @@ void initCTM(void){
 //----------------------------------------------------------------------------
 
 char idleMode = GL_TRUE;
-
+GLfloat speedMultiplier = 1.0;
+#define TRANSLATION_INCREMENT 0.01f*speedMultiplier
+#define ROTATION_INCREMENT    0.5f*speedMultiplier
+#define SCALE_INCREMENT       0.9f*speedMultiplier
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
     switch ( key ) {
+	// Commands that I made up
 	case 'I':
+		printf("Idle mode on\n");
 		idleMode = GL_TRUE;
 		break;
 	case 'i':
+		printf("Idle mode off\n");
 		idleMode = GL_FALSE;
 		break;
-	
+	case 'U':
+		printf("Speed increased:\n   Will not take effect until next command.\n");
+		speedMultiplier += 1;
+		break;
+	case 'u':
+		printf("Speed decreased:\n   Will not take effect until next command.\n");
+		speedMultiplier -= 1;
+		if (speedMultiplier < 1){
+			speedMultiplier = 0.5;
+			printf("Minimum speed = .5\n");
+		}
+		break;
+	case 'S':
+	case 's':
+		printf("Stopping the Object\n");
+		nextTransform = Angel::identity();
+		break;
 	default:
 		printf("Not Implemented! \n");
 		break;
 
+	// Because I wanted to do scale too
+	case 'L':
+		nextTransform = Angel::Scale(1/SCALE_INCREMENT);
+		break;
+	case 'l':
+		nextTransform = Angel::Scale(SCALE_INCREMENT);
+		break;
 
+
+	// My BETTER rotational commands
+	case 'D':
+		nextTransform = Angel::RotateX(ROTATION_INCREMENT);
+		break;
+	case 'd':
+		nextTransform = Angel::RotateX(-ROTATION_INCREMENT);
+		break;
+	case 'E':
+		nextTransform = Angel::RotateY(ROTATION_INCREMENT);
+		break;
+	case 'e':
+		nextTransform = Angel::RotateY(-ROTATION_INCREMENT);
+		break;
+	case 'F':
+		nextTransform = Angel::RotateZ(ROTATION_INCREMENT);
+		break;
+	case 'f':
+		nextTransform = Angel::RotateZ(-ROTATION_INCREMENT);
+		break;
+
+	// Translational commands
+	// ALL translational commands STOP the previous translation
 	case 'X': // Translate in positive X
-		nextTransform = Angel::Translate( 0.1f,0.0,0.0);
+		nextTransform = Angel::Translate( TRANSLATION_INCREMENT,0.0,0.0);
 		break;
 	case 'x': // Translate in negative X
-		nextTransform = Angel::Translate( -0.1f,0.0,0.0);
+		nextTransform = Angel::Translate( -TRANSLATION_INCREMENT,0.0,0.0);
 		break;
 
 	case 'Y': // Translate in positive Y
-		nextTransform = Angel::Translate( 0.0,0.1f,0.0);
+		nextTransform = Angel::Translate( 0.0,TRANSLATION_INCREMENT,0.0);
 		break;
 	case 'y': // Translate in negative Y
-		nextTransform = Angel::Translate( 0.0,-0.1f,0.0);
+		nextTransform = Angel::Translate( 0.0,-TRANSLATION_INCREMENT,0.0);
 		break;
 
 	case 'Z': // Translate in positive Z
-		nextTransform = Angel::Translate( 0.0,0.0,0.1f);
+		nextTransform = Angel::Translate( 0.0,0.0,TRANSLATION_INCREMENT);
 		break;
 	case 'z': // Translate in negative Z
-		nextTransform = Angel::Translate(  0.0,0.0,-0.1f);
+		nextTransform = Angel::Translate(  0.0,0.0,-TRANSLATION_INCREMENT);
 		break;
 
+	// Rotational Commands
+	// R
 
-	/// WTF THIS SHOULDN'T WORK
-	case 'S':
-	case 's':
-		printf("Stopping the Object");
+	// Color Commands
+	// c = toggle between random or red
+	
+	// Shearing
+	// h = increment +X shearing
+	// H = decrement 
+
+	// Twisting
+	// t = increment +y twist
+	// T = decrement
+
+
+	// Changing wireframes
+		// N = next, P = previous
+
+	// Reset
+	case 'W':
+		CTM = Angel::identity();
 		nextTransform = Angel::identity();
 		break;
+
+	// Quit commands
 	case 'q':
-   
-	
 	case 033:
         exit( EXIT_SUCCESS );
         break;
     }
 	
+
+	// Idle mode logic
 	if (idleMode != GL_TRUE){
 		CTM = CTM*nextTransform;
 	}

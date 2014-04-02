@@ -23,6 +23,7 @@ void main()
   interpolatedColor = vColor;
   
   // Old
+ //  gl_Position = Proj*model_matrix*vPosition;
  // gl_Position = Proj*vPosition;
   
 } 
