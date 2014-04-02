@@ -28,6 +28,15 @@ typedef struct {
 	Frame f;
 } MyPicture;
 
+typedef struct {
+	GLint numVertices;
+	MyPolyline* points; // holds points and number of points
+	vec3* triangles; // holds 3 numbers representing indecies of vertices
+	//vec4* colors; // could hold color data
+} PLYPicture;
+
+
+
 // Program locations
 extern GLuint program;
 extern GLint ProjLoc;
@@ -44,6 +53,11 @@ extern GLint colorLoc;
 #define DEFAULT_T 640.0
 #define DEFAULT_R 0.0
 #define DEFAULT_B 480.0
+
+
+// File reading usefulness
+#define BUFFER_SIZE 100 // 100 characters
+#define READ_NEXT_LINE fgets( buf, BUFFER_SIZE,f)
 
 
 // Vertex constants
@@ -106,6 +120,11 @@ void setViewPort(int X, int Y, int vpWidth, int vpHeight, Frame wFrame);
 MyPicture* readRandomPicture(void);
 MyPicture* parseGRS( char *file );
 
+// PLYreader.cpp
+
+
+// PLYPicture.cpp
+PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles);
 
 
 // draw.cpp

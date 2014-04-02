@@ -2,10 +2,7 @@
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 
-#define BUFFER_SIZE 100 // 100 characters
 char buf[BUFFER_SIZE];
-#define READ_NEXT_LINE fgets( buf, BUFFER_SIZE,f)
-
 
 /*****************************************************
 	FUNCTIONS based on given textFileRead function
