@@ -25,7 +25,9 @@ typedef Angel::vec4  point4;
 using namespace std;
 
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
-
+GLuint buffer;
+mat4 CTM;
+mat4 nextTransform;
 point4 points[NumVertices];
 color4 colors[NumVertices];
 
@@ -75,6 +77,25 @@ void colorcube()
     quad( 5, 4, 0, 1 );
 }
 
+// This stuff has to be done for each picture
+void bufferData(void){
+	// Create and initialize a buffer object ONCE VERTEX AND COLOR DATA IS ACCUMULATED
+    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),  NULL, GL_STATIC_DRAW );
+
+	// ACTUALLY SENDS DATA
+	glBufferSubData( GL_ARRAY_BUFFER, 0,              sizeof(points), points );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
+
+    // set up vertex arrays
+    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( vPosition );
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+
+    GLuint vColor = glGetAttribLocation( program, "vColor" ); 
+    glEnableVertexAttribArray( vColor );
+    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizeof(points)) );
+}
+
 void generateGeometry( void )
 {	
     colorcube();
@@ -84,31 +105,23 @@ void generateGeometry( void )
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao );
 
-    // Create and initialize a buffer object
-    GLuint buffer;
-    glGenBuffers( 1, &buffer );
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),
-		  NULL, GL_STATIC_DRAW );
-    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(points), points );
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
-
-
+    // sets the default color to clear screen
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+	
 	// Load shaders and use the resulting shader program
     program = InitShader( "vshader1.glsl", "fshader1.glsl" );
     glUseProgram( program );
-     // set up vertex arrays
-    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-    glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+	 
+    glGenBuffers( 1, &buffer );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+	
 
-    GLuint vColor = glGetAttribLocation( program, "vColor" ); 
-    glEnableVertexAttribArray( vColor );
-    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizeof(points)) );
 
-	// sets the default color to clear screen
-    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+	bufferData();
+	
+
 }
+
 
 void drawCube(void)
 {
@@ -122,6 +135,15 @@ void drawCube(void)
     glDrawArrays( GL_TRIANGLES, 0, NumVertices );
 	glDisable( GL_DEPTH_TEST ); 
 }
+
+
+void printMat4(mat4 m){
+	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[0][0],m[0][1],m[0][2],m[0][3]);	
+	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[1][0],m[1][1],m[1][2],m[1][3]);	
+	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[2][0],m[2][1],m[2][2],m[2][3]);	
+	printf("%4.2f   %4.2f   %4.2f   %4.2f\n\n", m[3][0],m[3][1],m[3][2],m[3][3]);
+}
+
 
 //----------------------------------------------------------------------------
 // this is where the drawing should happen
@@ -171,18 +193,12 @@ void display( void )
 
 	// WARNING1: I believe Angel::transpose(...) does not transpose a mat4, but just returns
 	// an identical matrix, can anyone verify this?
-	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)45.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 100.0);
-	
-	Angel::mat4 modelMat = Angel::identity();
-	modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
+
 
 	// set up projection matricies
-	GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
-	glUniformMatrix4fv( modelMatrix, 1, GL_TRUE, modelMat );
-
-
-	GLuint viewMatrix = glGetUniformLocationARB(program, "Proj");
-	glUniformMatrix4fv( viewMatrix, 1, GL_TRUE, perspectiveMat);
+	
+	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM);
 
 	drawCube();
 
@@ -192,17 +208,96 @@ void display( void )
 	// you can implement your own buffers with textures
 }
 
+
+void initCTM(void){
+	// Probably dependent on the picture
+	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)45.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 100.0);
+
+	// arbitrary transformations
+	Angel::mat4 modelMat = Angel::identity();
+	modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
+	printMat4(modelMat);
+
+	nextTransform = Angel::identity();
+	CTM = perspectiveMat*modelMat;
+}
+
+
+
+
+
 //----------------------------------------------------------------------------
+
+char idleMode = GL_TRUE;
 
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
     switch ( key ) {
-    case 033:
+	case 'I':
+		idleMode = GL_TRUE;
+		break;
+	case 'i':
+		idleMode = GL_FALSE;
+		break;
+	
+	default:
+		printf("Not Implemented! \n");
+		break;
+
+
+	case 'X': // Translate in positive X
+		nextTransform = Angel::Translate( 0.1f,0.0,0.0);
+		break;
+	case 'x': // Translate in negative X
+		nextTransform = Angel::Translate( -0.1f,0.0,0.0);
+		break;
+
+	case 'Y': // Translate in positive Y
+		nextTransform = Angel::Translate( 0.0,0.1f,0.0);
+		break;
+	case 'y': // Translate in negative Y
+		nextTransform = Angel::Translate( 0.0,-0.1f,0.0);
+		break;
+
+	case 'Z': // Translate in positive Z
+		nextTransform = Angel::Translate( 0.0,0.0,0.1f);
+		break;
+	case 'z': // Translate in negative Z
+		nextTransform = Angel::Translate(  0.0,0.0,-0.1f);
+		break;
+
+
+	/// WTF THIS SHOULDN'T WORK
+	case 'S':
+	case 's':
+		printf("Stopping the Object");
+		nextTransform = Angel::identity();
+		break;
+	case 'q':
+   
+	
+	case 033:
         exit( EXIT_SUCCESS );
         break;
     }
+	
+	if (idleMode != GL_TRUE){
+		CTM = CTM*nextTransform;
+	}
+	display();
 }
+
+
+// Multiply the current transform matrix by the next transform to do fun stuff!
+void idleTransformations(void){
+	if (idleMode == GL_TRUE){
+		CTM = CTM*nextTransform;
+		display();
+		glutPostRedisplay(); //?
+	}
+}
+
 
 //----------------------------------------------------------------------------
 // entry point
@@ -210,7 +305,8 @@ int HW2( int argc, char **argv )
 {
 	
 	genericInit(argc, argv, "Color Cube");
-	
+	initCTM();
+
     generateGeometry();
 
 	// assign handlers
@@ -219,6 +315,8 @@ int HW2( int argc, char **argv )
 	// should add menus
 	// add mouse handler
 	// add resize window functionality (should probably try to preserve aspect ratio)
+
+	glutIdleFunc(idleTransformations);
 
 	// enter the drawing loop
 	// frame rate can be controlled with 

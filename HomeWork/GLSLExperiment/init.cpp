@@ -41,7 +41,13 @@ void initGPUBuffers1( void )
     GLuint buffer;
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
+
+
 }
+
+
+
+
 
 
 void shaderSetup1( void )
