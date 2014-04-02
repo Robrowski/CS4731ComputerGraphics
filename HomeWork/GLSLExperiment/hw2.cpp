@@ -18,7 +18,7 @@ void quad( int a, int b, int c, int d );
 void colorcube(void);
 void drawCube(void);
 
-typedef Angel::vec4  color4;
+
 typedef Angel::vec4  point4;
 
 
@@ -29,7 +29,6 @@ GLuint buffer;
 mat4 CTM;
 mat4 nextTransform;
 point4 points[NumVertices];
-color4 colors[NumVertices];
 
 // Vertices of a unit cube centered at origin, sides aligned with axes
 point4 vertices[8] = {
@@ -66,27 +65,11 @@ void quad( int a, int b, int c, int d )
     points[Index] = vertices[d]; Index++;
 }
 
-void assignColorsRandomly(int numberOfVertices){
-	int i;
-	for (i = 0; i < numberOfVertices; i++){
-		colors[i] = vertex_colors[rand()%8];
-	}
-}
-
-void assignColorsRed(int numberOfVertices){
-	int i;
-	for (i = 0; i < numberOfVertices; i++){
-		colors[i] = RED_VEC;
-	}
-}
-
-
 
 // generate 12 triangles: 36 vertices and 36 colors
 void colorcube()
 {
-    assignColorsRandomly(NumVertices);
-//	assignColorsRed(NumVertices);
+
 	quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
@@ -98,11 +81,11 @@ void colorcube()
 // This stuff has to be done for each picture
 void bufferData(void){
 	// Create and initialize a buffer object ONCE VERTEX AND COLOR DATA IS ACCUMULATED
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),  NULL, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(color4)*NumVertices,  NULL, GL_STATIC_DRAW );
 
 	// ACTUALLY SENDS DATA
 	glBufferSubData( GL_ARRAY_BUFFER, 0,              sizeof(points), points );
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
+	glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, randomColors(NumVertices) );
 
     // set up vertex arrays
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
@@ -223,21 +206,8 @@ void display( void )
 
 
 void initCTM(void){
-/*	// Probably dependent on the picture
-	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)45.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 100.0);
-
-	// arbitrary transformations
-	Angel::mat4 modelMat = Angel::identity();
-	modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
-	printMat4(modelMat);
-
-	nextTransform = Angel::identity();
-	CTM = perspectiveMat*modelMat;
-
-	// could be good stuff for setting up PLY files intitially
-	*/
-
 	CTM = Angel::identity();
+	nextTransform = Angel::identity();
 }
 
 
@@ -245,12 +215,12 @@ void initCTM(void){
 
 
 //----------------------------------------------------------------------------
-
+char colorMode = 1;
 char idleMode = GL_TRUE;
 GLfloat speedMultiplier = 1.0;
 #define TRANSLATION_INCREMENT 0.01f*speedMultiplier
 #define ROTATION_INCREMENT    0.5f*speedMultiplier
-#define SCALE_INCREMENT       0.9f*speedMultiplier
+#define SCALE_INCREMENT       0.99f*speedMultiplier
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
@@ -341,7 +311,16 @@ void keyboard( unsigned char key, int x, int y )
 	// R
 
 	// Color Commands
-	// c = toggle between random or red
+	//c = toggle between random or red
+	case 'c':
+		colorMode = !colorMode;
+		if (colorMode){
+			glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, randomColors(NumVertices) );
+		 } else{
+			glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, redArray(NumVertices) );
+		 }
+		break;
+
 	
 	// Shearing
 	// h = increment +X shearing

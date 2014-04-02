@@ -13,3 +13,16 @@ PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles){
 	ply->triangles = (vec3 *) calloc(numTriangles, sizeof(vec3)); // Data is zeroed
 	return ply;
 }
+
+
+
+void drawPLYPicture(PLYPicture* p){
+
+
+
+
+	// Buffering data
+
+
+
+}

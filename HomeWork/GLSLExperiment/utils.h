@@ -3,7 +3,7 @@
 
 #include "Angel.h"
 typedef vec4 MyPoint;
-
+typedef vec4  color4;
 
 typedef struct {
 	float L;
@@ -104,6 +104,8 @@ void keyboard1( unsigned char key, int x, int y );
 
 // color.cpp
 void setLineColor(vec4 toSet);
+color4* redArray(GLint num);
+color4* randomColors(GLint num);
 
 
 // frame.cpp
