@@ -17,7 +17,7 @@ void quad( int a, int b, int c, int d );
 void colorcube(void);
 void drawCube(void);
 
-typedef Angel::vec4  point4;
+typedef  vec4  point4;
 
 using namespace std;
 
@@ -28,7 +28,6 @@ mat4 nextTransform;
 
 void generateGeometry( void )
 {	
-   // colorcube();
 
     // Create a vertex array object
     GLuint vao;
@@ -124,18 +123,37 @@ void display( void )
 	// you can implement your own buffers with textures
 }
 
-// Initializes the current transformation matrix and others
-void initCTM(void){
-	CTM = Angel::identity();
+
+// Set the nextTransformation to be the identity matrix
+void stopCTM(void){
 	nextTransform = Angel::identity();
 }
 
+// Initializes the current transformation matrix and others
+void initCTM(void){
+	CTM = Angel::identity();
+	stopCTM();
+}
 
 
+// If a key is repeated, the motion is stopped. Else, set motion
+// Mat = a motion because it will be the "nextTransformation"
+// cmd is the command key
+char lastCommand = 'q';
+void toggleTransform(mat4 mat, char cmd){
+	if (cmd == lastCommand){
+		stopCTM();
+		lastCommand = 'q'; //default
+	} else {
+		nextTransform = mat;
+		lastCommand = cmd;
+	}
+}
 
+// A macro for compressing a case statement
+#define COMMAND_CASE(mat,key) case key: toggleTransform(mat,key); break;
 
-//----------------------------------------------------------------------------
-char colorMode = 1;
+char colorMode = GL_TRUE;
 char idleMode = GL_TRUE;
 GLfloat speedMultiplier = 1.0;
 #define TRANSLATION_INCREMENT 0.01f*speedMultiplier
@@ -176,56 +194,26 @@ void keyboard( unsigned char key, int x, int y )
 		break;
 
 	// Because I wanted to do scale too
-	case 'L':
-		nextTransform = Angel::Scale(1/SCALE_INCREMENT);
-		break;
-	case 'l':
-		nextTransform = Angel::Scale(SCALE_INCREMENT);
-		break;
-
+	COMMAND_CASE(Scale(1/SCALE_INCREMENT),'L');
+	COMMAND_CASE(Scale(  SCALE_INCREMENT),'l');
 
 	// My BETTER rotational commands
-	case 'D':
-		nextTransform = Angel::RotateX(ROTATION_INCREMENT);
-		break;
-	case 'd':
-		nextTransform = Angel::RotateX(-ROTATION_INCREMENT);
-		break;
-	case 'E':
-		nextTransform = Angel::RotateY(ROTATION_INCREMENT);
-		break;
-	case 'e':
-		nextTransform = Angel::RotateY(-ROTATION_INCREMENT);
-		break;
-	case 'F':
-		nextTransform = Angel::RotateZ(ROTATION_INCREMENT);
-		break;
-	case 'f':
-		nextTransform = Angel::RotateZ(-ROTATION_INCREMENT);
-		break;
+	COMMAND_CASE( RotateX( ROTATION_INCREMENT),'D');
+	COMMAND_CASE( RotateX(-ROTATION_INCREMENT),'d');
+	COMMAND_CASE( RotateY( ROTATION_INCREMENT),'E');
+	COMMAND_CASE( RotateY(-ROTATION_INCREMENT),'e');
+	COMMAND_CASE( RotateZ( ROTATION_INCREMENT),'F');
+	COMMAND_CASE( RotateZ(-ROTATION_INCREMENT),'f');
 
 	// Translational commands
 	// ALL translational commands STOP the previous translation
-	case 'X': // Translate in positive X
-		nextTransform = Angel::Translate( TRANSLATION_INCREMENT,0.0,0.0);
-		break;
-	case 'x': // Translate in negative X
-		nextTransform = Angel::Translate( -TRANSLATION_INCREMENT,0.0,0.0);
-		break;
+	COMMAND_CASE( Translate(  TRANSLATION_INCREMENT,0.0,0.0),'X');// Translate in positive X
+	COMMAND_CASE( Translate( -TRANSLATION_INCREMENT,0.0,0.0),'x');// Translate in negative X		
+	COMMAND_CASE( Translate( 0.0, TRANSLATION_INCREMENT,0.0),'Y'); // Translate in positive Y
+	COMMAND_CASE( Translate( 0.0,-TRANSLATION_INCREMENT,0.0),'y');// Translate in negative Y
+	COMMAND_CASE( Translate( 0.0,0.0, TRANSLATION_INCREMENT),'Z'); // Translate in positive Z
+	COMMAND_CASE( Translate( 0.0,0.0,-TRANSLATION_INCREMENT),'z');// Translate in negative Z
 
-	case 'Y': // Translate in positive Y
-		nextTransform = Angel::Translate( 0.0,TRANSLATION_INCREMENT,0.0);
-		break;
-	case 'y': // Translate in negative Y
-		nextTransform = Angel::Translate( 0.0,-TRANSLATION_INCREMENT,0.0);
-		break;
-
-	case 'Z': // Translate in positive Z
-		nextTransform = Angel::Translate( 0.0,0.0,TRANSLATION_INCREMENT);
-		break;
-	case 'z': // Translate in negative Z
-		nextTransform = Angel::Translate(  0.0,0.0,-TRANSLATION_INCREMENT);
-		break;
 
 	// Rotational Commands
 	// R
@@ -256,8 +244,8 @@ void keyboard( unsigned char key, int x, int y )
 
 	// Reset
 	case 'W':
-		CTM = Angel::identity();
-		nextTransform = Angel::identity();
+		CTM =  Angel::identity();
+		stopCTM();
 		break;
 
 	// Quit commands
@@ -271,6 +259,7 @@ void keyboard( unsigned char key, int x, int y )
 	// Idle mode logic
 	if (idleMode != GL_TRUE){
 		CTM = CTM*nextTransform;
+		stopCTM();
 	}
 	display();
 }
