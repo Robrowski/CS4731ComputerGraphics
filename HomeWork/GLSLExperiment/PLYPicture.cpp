@@ -53,6 +53,10 @@ PLYPicture* generatePLYCube(void){
 	pic->triangles[10] = vec3(4, 6, 7);
 	pic->triangles[11] = vec3(5, 0, 1);
 
+	// Boundaries
+	pic->max = vec3(.5, .5, .5);
+	pic->min = vec3(-.5,-.5,-.5);
+
 	return pic;
 }
 

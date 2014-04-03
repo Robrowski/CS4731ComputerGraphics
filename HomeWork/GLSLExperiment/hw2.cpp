@@ -106,11 +106,19 @@ void display( void )
 	// also scale your objects appropriatly, dont use scales at the upper or lower bounds
 	// of floating point precision
 
+	// The center of the mesh
+	vec4 at = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2,(pic->max.z + pic->min.z)/2 ,1.0);
+	vec4 eye = vec4(0,0,pic->max.z,1);
+	vec4 up = vec4( 0,  pic->max.y,0    ,1);
+	mat4 camera = Angel::LookAt(eye    ,at,up );
+
+
+
 
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM*ReshapeMat);
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, camera*CTM*ReshapeMat);
 
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -256,21 +264,26 @@ void keyboard( unsigned char key, int x, int y )
 
 	// Changing wireframes
 	case 'N':
+		initCTM();
 		pic = readPLYFile(nextFile());
 		numPoints = pic->numPointsInPicture;
 		drawPLYPicture(pic);
 		break;
 	case 'P':
+		initCTM();
 		pic = readPLYFile(prevFile());
 		numPoints = pic->numPointsInPicture;
 		drawPLYPicture(pic);
 		break;
-		
+	case '[':
+		pic = generatePLYCube();
+		numPoints = pic->numPointsInPicture;
+		drawPLYPicture(pic);
+		break;
 
 	// Reset
 	case 'W':
-		CTM =  Angel::identity();
-		stopCTM();
+		initCTM();
 		break;
 
 	// Quit commands
@@ -312,9 +325,6 @@ int HW2( int argc, char **argv )
 
 	shaderSetupTwo();
 
-
-  //  generateGeometry();
-//	pic = generatePLYCube();
 	pic = readPLYFile(nextFile());
 	numPoints = pic->numPointsInPicture;
 	drawPLYPicture(pic);

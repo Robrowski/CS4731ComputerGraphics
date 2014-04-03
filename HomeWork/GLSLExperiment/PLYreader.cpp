@@ -3,6 +3,8 @@
 
 
 
+
+
 // File reading usefulness
 char plybuf[BUFFER_SIZE];
 #define READ_LINE fgets( plybuf, BUFFER_SIZE,f)
@@ -40,12 +42,32 @@ PLYPicture* readPLYFile(char* file){
 
 	// Points
 	MyPoint* pts = newPLY->points->pt; // shortcut
-	for (i = 0; i < numVertices; i++){
-		float x , y , z;
+	
+	// Reading first line
+	float x , y , z;
+	if (sscanf(READ_LINE, "%f %f %f", &x, &y, &z) != 3) return NULL;
+	vec3 maxPt = vec3(x,y,z); // Best place to start is with first point
+	vec3 minPt = vec3(x,y,z);
+	pts[0] = MyPoint(x,y,z, 1.0f);
+	for (i = 1; i < numVertices; i++){
 		if (sscanf(READ_LINE, "%f %f %f", &x, &y, &z) != 3) return NULL;
 		pts[i] = MyPoint(x,y,z, 1.0f);
-	//	printf("X: %f, Y: %f, Z: %f\n",x,y,z);
+	
+		// Boundaries too
+		maxPt.x = max(maxPt.x,x);
+		maxPt.y = max(maxPt.y,y);
+		maxPt.z = max(maxPt.z,z);
+		
+		minPt.x = min(minPt.x,x);
+		minPt.y = min(minPt.y,y);
+		minPt.z = min(minPt.z,z);
+		//	printf("X: %f, Y: %f, Z: %f\n",x,y,z);
 	}
+
+	newPLY->max = maxPt;
+	newPLY->min = minPt;
+	printf("Max: ");	printv(maxPt); printf("\nMin: ");printv(minPt); printf("\n");
+
 
 	// Triangles
 	for (i = 0; i < numTriangles; i++){

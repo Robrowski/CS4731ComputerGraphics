@@ -34,6 +34,8 @@ typedef struct {
 	MyPolyline* points; // holds points and number of points
 	vec3* triangles; // holds 3 numbers representing indecies of vertices
 	//vec4* colors; // could hold color data
+	vec3 max;
+	vec3 min;
 } PLYPicture;
 
 
@@ -44,8 +46,8 @@ extern GLint ProjLoc;
 extern GLint colorLoc;
 
 // Default world window
-#define WINDOW_WIDTH  512 //640
-#define WINDOW_HEIGHT 512
+#define WINDOW_WIDTH  1000 //640
+#define WINDOW_HEIGHT 800
 #define FIFTY_MILLION 50*1000*1000
 #define ONE_MILLION      1000*1000
 
@@ -147,7 +149,13 @@ void drawSierpinski(void);
 void drawQuadrants(int X, int Y, int width, int height, int numRecursions,MyPicture pics[], int iterationNumber);
 
 
-
+// Math
+#ifndef max
+	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+#ifndef min
+	#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
+#endif
 
 
 
