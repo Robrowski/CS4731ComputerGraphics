@@ -30,6 +30,7 @@ typedef struct {
 
 typedef struct {
 	GLint numTriangles;
+	GLint numPointsInPicture;
 	MyPolyline* points; // holds points and number of points
 	vec3* triangles; // holds 3 numbers representing indecies of vertices
 	//vec4* colors; // could hold color data
@@ -82,6 +83,8 @@ int textFileWrite(char *fn, char *s) ;
 void genericInit( int argc, char **argv, char* window);
 void initGPUBuffers1( void );
 void shaderSetup1( void );
+void shaderSetupTwo( void );
+
 
 // MyPolyline.cpp
 MyPolyline* generateEmptyPolyline(int size);
@@ -123,6 +126,9 @@ MyPicture* readRandomPicture(void);
 MyPicture* parseGRS( char *file );
 
 // PLYreader.cpp
+PLYPicture* readPLYFile(char* file);
+char* prevFile(void);
+char* nextFile(void);
 
 
 // PLYPicture.cpp

@@ -23,11 +23,11 @@
     <Filter Include="Source Files\Abstractions">
       <UniqueIdentifier>{c03ad1e4-ebe0-411b-9c7a-4639718547b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PLY Files">
-      <UniqueIdentifier>{a322a2fd-7e53-4dc6-9286-868e9c3638d6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\FileReaders">
       <UniqueIdentifier>{d58ab775-4c8b-4ec4-8f9c-b54884993300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PLYFiles">
+      <UniqueIdentifier>{a322a2fd-7e53-4dc6-9286-868e9c3638d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -135,133 +135,133 @@
       <Filter>Polyline Files</Filter>
     </None>
     <None Include="ply_files\airplane.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\ant.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\apple.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\balance.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\beethoven.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\big_atc.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\big_dodge.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\big_porsche.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\big_spider.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\canstick.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\chopper.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\cow.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\dolphins.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\egret.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\f16.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\footbones.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\fracttree.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\galleon.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\hammerhead.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\helix.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\hind.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\kerolamp.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\ketchup.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\mug.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\part.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\pickup_big.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\pump.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\pumpa_tb.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\sandal.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\saratoga.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\scissors.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\shark.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\steeringweel.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\stratocaster.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\street_lamp.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\teapot.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\tennis_shoe.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\tommygun.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\trashcan.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\turbine.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\urn2.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\walkman.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
     <None Include="ply_files\weathervane.ply">
-      <Filter>PLY Files</Filter>
+      <Filter>PLYFiles</Filter>
     </None>
   </ItemGroup>
 </Project>

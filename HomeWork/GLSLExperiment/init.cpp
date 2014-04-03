@@ -9,7 +9,7 @@ GLuint program;
 // Specifically for vertex shader and scaling
 GLint ProjLoc;
 GLint colorLoc;
-
+GLuint buffer;
 
 /** Basic inits for the general case */
 void genericInit( int argc, char **argv, char* window){
@@ -74,5 +74,26 @@ void shaderSetup1( void )
 
 	// Default color
 	setLineColor(RED_VEC);
+
+}
+
+
+void shaderSetupTwo(void){
+	
+	// Create a vertex array object
+    GLuint vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao );
+
+    // sets the default color to clear screen
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+	
+	// Load shaders and use the resulting shader program
+    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
+    glUseProgram( program );
+	 
+    glGenBuffers( 1, &buffer );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+
 
 }

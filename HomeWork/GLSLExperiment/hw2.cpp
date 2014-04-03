@@ -21,44 +21,50 @@ typedef  vec4  point4;
 
 using namespace std;
 
-GLuint buffer;
+
 mat4 CTM;
+mat4 ReshapeMat;
 mat4 nextTransform;
 
+PLYPicture* pic;
+GLint numPoints;
 
-void generateGeometry( void )
-{	
 
-    // Create a vertex array object
-    GLuint vao;
-    glGenVertexArrays( 1, &vao );
-    glBindVertexArray( vao );
+char colorMode = GL_TRUE;
+char idleMode = GL_TRUE;
+GLfloat speedMultiplier = 1.0;
+#define TRANSLATION_INCREMENT 0.01f*speedMultiplier
+#define ROTATION_INCREMENT    0.5f*speedMultiplier
+#define SCALE_INCREMENT       0.99f*speedMultiplier
 
-    // sets the default color to clear screen
-    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+
+
+// Make a shear matrix that sheers by h
+mat4 shear(GLfloat h){
+	mat4 sheared = Angel::identity();
+
+	sheared[0][1] = h;
+
+	return sheared;
+}
+
+// Make a twist matrix that twists by t
+mat4 twist(GLfloat t){
+	mat4 twisted = Angel::RotateY(10);
+
+	twisted[0][1] = .3*t;
+	twisted[2][1] = .3*t;
 	
-	// Load shaders and use the resulting shader program
-    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
-    glUseProgram( program );
-	 
-    glGenBuffers( 1, &buffer );
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );
-	
-	//bufferData();
-	drawPLYPicture(generatePLYCube());
+	printm(twisted);
+	return twisted;
 }
 
 
-void printMat4(mat4 m){
-	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[0][0],m[0][1],m[0][2],m[0][3]);	
-	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[1][0],m[1][1],m[1][2],m[1][3]);	
-	printf("%4.2f   %4.2f   %4.2f   %4.2f\n", m[2][0],m[2][1],m[2][2],m[2][3]);	
-	printf("%4.2f   %4.2f   %4.2f   %4.2f\n\n", m[3][0],m[3][1],m[3][2],m[3][3]);
-}
 
 
 //----------------------------------------------------------------------------
 // this is where the drawing should happen
+// ASSUME GPU BUFFERS ARE ALREADY LOADED
 void display( void )
 {
 	// remember to enable depth buffering when drawing in 3d
@@ -104,7 +110,7 @@ void display( void )
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM);
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM*ReshapeMat);
 
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -113,7 +119,7 @@ void display( void )
 	// the depth is disabled after the draw 
 	// in case you need to draw overlays
 	glEnable( GL_DEPTH_TEST );
-    glDrawArrays( GL_TRIANGLES, 0, 36 ); // = Num triangles * 3
+    glDrawArrays( GL_TRIANGLES, 0, numPoints ); // = Num triangles * 3
 	glDisable( GL_DEPTH_TEST ); 
 
 
@@ -133,6 +139,7 @@ void stopCTM(void){
 void initCTM(void){
 	CTM = Angel::identity();
 	stopCTM();
+	ReshapeMat = Angel::identity();
 }
 
 
@@ -153,12 +160,7 @@ void toggleTransform(mat4 mat, char cmd){
 // A macro for compressing a case statement
 #define COMMAND_CASE(mat,key) case key: toggleTransform(mat,key); break;
 
-char colorMode = GL_TRUE;
-char idleMode = GL_TRUE;
-GLfloat speedMultiplier = 1.0;
-#define TRANSLATION_INCREMENT 0.01f*speedMultiplier
-#define ROTATION_INCREMENT    0.5f*speedMultiplier
-#define SCALE_INCREMENT       0.99f*speedMultiplier
+
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
@@ -194,8 +196,12 @@ void keyboard( unsigned char key, int x, int y )
 		break;
 
 	// Because I wanted to do scale too
-	COMMAND_CASE(Scale(1/SCALE_INCREMENT),'L');
-	COMMAND_CASE(Scale(  SCALE_INCREMENT),'l');
+	case 'L': 
+		ReshapeMat = ReshapeMat*Scale(1/SCALE_INCREMENT);
+		break;
+	case 'l': 
+		ReshapeMat = ReshapeMat*Scale(  SCALE_INCREMENT);
+		break;
 
 	// My BETTER rotational commands
 	COMMAND_CASE( RotateX( ROTATION_INCREMENT),'D');
@@ -223,24 +229,43 @@ void keyboard( unsigned char key, int x, int y )
 	case 'c':
 		colorMode = !colorMode;
 		if (colorMode){
-			glBufferSubData( GL_ARRAY_BUFFER,  36*sizeof(MyPoint), sizeof(color4)*36, randomColors(36) );
+			glBufferSubData( GL_ARRAY_BUFFER,  numPoints*sizeof(MyPoint), sizeof(color4)*numPoints, randomColors(numPoints) );
 		 } else{
-			glBufferSubData( GL_ARRAY_BUFFER,  36*sizeof(MyPoint), sizeof(color4)*36, redArray(36) );
+			glBufferSubData( GL_ARRAY_BUFFER,  numPoints*sizeof(MyPoint), sizeof(color4)*numPoints, redArray(numPoints) );
 		 }
 		break;
 
 	
 	// Shearing
-	// h = increment +X shearing
-	// H = decrement 
+	case 'h': // h = increment +X shearing
+		ReshapeMat = ReshapeMat*shear( 0.5);
+		break;
+	case 'H': // H = decrement 
+		ReshapeMat = ReshapeMat*shear(-0.5);
+		break;
 
-	// Twisting
-	// t = increment +y twist
-	// T = decrement
+		// Twisting
+	case 't': // t = increment +y twist
+		ReshapeMat = ReshapeMat*twist(1);
+		break;
+	case 'T': // T = decrement
+		ReshapeMat = ReshapeMat*twist(-1);
+		break;
+
 
 
 	// Changing wireframes
-		// N = next, P = previous
+	case 'N':
+		pic = readPLYFile(nextFile());
+		numPoints = pic->numPointsInPicture;
+		drawPLYPicture(pic);
+		break;
+	case 'P':
+		pic = readPLYFile(prevFile());
+		numPoints = pic->numPointsInPicture;
+		drawPLYPicture(pic);
+		break;
+		
 
 	// Reset
 	case 'W':
@@ -265,6 +290,8 @@ void keyboard( unsigned char key, int x, int y )
 }
 
 
+
+
 // Multiply the current transform matrix by the next transform to do fun stuff!
 void idleTransformations(void){
 	if (idleMode == GL_TRUE){
@@ -283,7 +310,15 @@ int HW2( int argc, char **argv )
 	genericInit(argc, argv, "Color Cube");
 	initCTM();
 
-    generateGeometry();
+	shaderSetupTwo();
+
+
+  //  generateGeometry();
+//	pic = generatePLYCube();
+	pic = readPLYFile(nextFile());
+	numPoints = pic->numPointsInPicture;
+	drawPLYPicture(pic);
+
 
 	// assign handlers
     glutDisplayFunc( display );

@@ -10,6 +10,7 @@ PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles){
 	PLYPicture* ply = (PLYPicture*) malloc(sizeof(PLYPicture));
 	ply->numTriangles = numTriangles;
 	ply->points = generateEmptyPolyline(numVertices);
+	ply->numPointsInPicture = numTriangles*3;
 	ply->triangles = (vec3 *) calloc(numTriangles, sizeof(vec3)); // Data is zeroed
 	return ply;
 }
