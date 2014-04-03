@@ -6,30 +6,30 @@ typedef vec4 MyPoint;
 typedef vec4  color4;
 
 typedef struct {
-	float L;
-	float R;
-	float T;
-	float B;
+	GLfloat L;
+	GLfloat R;
+	GLfloat T;
+	GLfloat B;
 } Frame;
 
 
 // Data types
 // A single polyline
 struct MyPolyline{
-	int NumPoints;
+	GLint NumPoints;
 	MyPoint* pt; // Pointer to c-allocated array
 } ;
 typedef struct MyPolyline MyPolyline;
 
 // A series of polines
 typedef struct {
-	int numLines;
+	GLint numLines;
 	MyPolyline* pl;
 	Frame f;
 } MyPicture;
 
 typedef struct {
-	GLint numVertices;
+	GLint numTriangles;
 	MyPolyline* points; // holds points and number of points
 	vec3* triangles; // holds 3 numbers representing indecies of vertices
 	//vec4* colors; // could hold color data
@@ -127,6 +127,8 @@ MyPicture* parseGRS( char *file );
 
 // PLYPicture.cpp
 PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles);
+void drawPLYPicture(PLYPicture* p);
+PLYPicture* generatePLYCube(void);
 
 
 // draw.cpp

@@ -1,6 +1,5 @@
-// HW 1. 
+// HW 2. 
 // Robert Dabrowski   rpdabrowski@wpi.edu
-
 
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
@@ -18,88 +17,18 @@ void quad( int a, int b, int c, int d );
 void colorcube(void);
 void drawCube(void);
 
-
 typedef Angel::vec4  point4;
-
 
 using namespace std;
 
-const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 GLuint buffer;
 mat4 CTM;
 mat4 nextTransform;
-point4 points[NumVertices];
 
-// Vertices of a unit cube centered at origin, sides aligned with axes
-point4 vertices[8] = {
-    point4( -0.5, -0.5,  0.5, 1.0 ),
-    point4( -0.5,  0.5,  0.5, 1.0 ),
-    point4(  0.5,  0.5,  0.5, 1.0 ),
-    point4(  0.5, -0.5,  0.5, 1.0 ),
-    point4( -0.5, -0.5, -0.5, 1.0 ),
-    point4( -0.5,  0.5, -0.5, 1.0 ),
-    point4(  0.5,  0.5, -0.5, 1.0 ),
-    point4(  0.5, -0.5, -0.5, 1.0 )
-};
-// RGBA olors
-color4 vertex_colors[8] = {
-    color4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    color4( 1.0, 0.0, 0.0, 1.0 ),  // red
-    color4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    color4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    color4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    color4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    color4( 1.0, 1.0, 1.0, 1.0 ),  // white
-    color4( 0.0, 1.0, 1.0, 1.0 )   // cyan
-};
-// quad generates two triangles for each face and assigns colors
-//    to the vertices
-int Index = 0;
-void quad( int a, int b, int c, int d )
-{
-    points[Index] = vertices[a]; Index++;
-    points[Index] = vertices[b]; Index++;
-    points[Index] = vertices[c]; Index++;
-    points[Index] = vertices[a]; Index++;
-    points[Index] = vertices[c]; Index++;
-    points[Index] = vertices[d]; Index++;
-}
-
-
-// generate 12 triangles: 36 vertices and 36 colors
-void colorcube()
-{
-
-	quad( 1, 0, 3, 2 );
-    quad( 2, 3, 7, 6 );
-    quad( 3, 0, 4, 7 );
-    quad( 6, 5, 1, 2 );
-    quad( 4, 5, 6, 7 );
-    quad( 5, 4, 0, 1 );
-}
-
-// This stuff has to be done for each picture
-void bufferData(void){
-	// Create and initialize a buffer object ONCE VERTEX AND COLOR DATA IS ACCUMULATED
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(color4)*NumVertices,  NULL, GL_STATIC_DRAW );
-
-	// ACTUALLY SENDS DATA
-	glBufferSubData( GL_ARRAY_BUFFER, 0,              sizeof(points), points );
-	glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, randomColors(NumVertices) );
-
-    // set up vertex arrays
-    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-    glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
-
-    GLuint vColor = glGetAttribLocation( program, "vColor" ); 
-    glEnableVertexAttribArray( vColor );
-    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizeof(points)) );
-}
 
 void generateGeometry( void )
 {	
-    colorcube();
+   // colorcube();
 
     // Create a vertex array object
     GLuint vao;
@@ -116,25 +45,8 @@ void generateGeometry( void )
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
 	
-
-
-	bufferData();
-	
-
-}
-
-
-void drawCube(void)
-{
-	// change to GL_FILL
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	// draw functions should enable then disable the features 
-	// that are specifit the themselves
-	// the depth is disabled after the draw 
-	// in case you need to draw overlays
-	glEnable( GL_DEPTH_TEST );
-    glDrawArrays( GL_TRIANGLES, 0, NumVertices ); // = Num triangles * 3
-	glDisable( GL_DEPTH_TEST ); 
+	//bufferData();
+	drawPLYPicture(generatePLYCube());
 }
 
 
@@ -192,11 +104,19 @@ void display( void )
 
 
 	// set up projection matricies
-	
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM);
 
-	drawCube();
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// draw functions should enable then disable the features 
+	// that are specifit the themselves
+	// the depth is disabled after the draw 
+	// in case you need to draw overlays
+	glEnable( GL_DEPTH_TEST );
+    glDrawArrays( GL_TRIANGLES, 0, 36 ); // = Num triangles * 3
+	glDisable( GL_DEPTH_TEST ); 
+
 
 
 	// use this call to double buffer
@@ -204,7 +124,7 @@ void display( void )
 	// you can implement your own buffers with textures
 }
 
-
+// Initializes the current transformation matrix and others
 void initCTM(void){
 	CTM = Angel::identity();
 	nextTransform = Angel::identity();
@@ -315,9 +235,9 @@ void keyboard( unsigned char key, int x, int y )
 	case 'c':
 		colorMode = !colorMode;
 		if (colorMode){
-			glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, randomColors(NumVertices) );
+			glBufferSubData( GL_ARRAY_BUFFER,  36*sizeof(MyPoint), sizeof(color4)*36, randomColors(36) );
 		 } else{
-			glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(color4)*NumVertices, redArray(NumVertices) );
+			glBufferSubData( GL_ARRAY_BUFFER,  36*sizeof(MyPoint), sizeof(color4)*36, redArray(36) );
 		 }
 		break;
 

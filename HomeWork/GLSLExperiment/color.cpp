@@ -1,5 +1,6 @@
 #include "Angel.h"
 #include "utils.h"
+#include <stdlib.h>
 
 // Sends teh given color vector to the fragment shader for colorizing
 void setLineColor(vec4 toSet){
@@ -21,14 +22,14 @@ color4 colorsAvailable[NUM_AVAILABLE_COLORS] = {
 
 // Generates an array of random colors from 0 to num - 1
 color4* randomColors(GLint num){
-	color4* colors = (color4*) calloc(num, sizeof(color4));
+	color4* newColors = (color4*) calloc(num, sizeof(color4));
 
 	int i;
 	for (i = 0; i < num; i++){
-		colors[i] = colorsAvailable[rand()%NUM_AVAILABLE_COLORS];
+		newColors[i] = colorsAvailable[rand()%NUM_AVAILABLE_COLORS];
 	}
 
-	return colors;
+	return newColors;
 }
 
 // Generates an array of red
