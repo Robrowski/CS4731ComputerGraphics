@@ -13,9 +13,7 @@ int height = WINDOW_HEIGHT;
 void generateGeometry( void );
 void display( void );
 void keyboard( unsigned char key, int x, int y );
-void quad( int a, int b, int c, int d );
-void colorcube(void);
-void drawCube(void);
+
 
 typedef  vec4  point4;
 
@@ -29,7 +27,7 @@ mat4 nextTransform;
 PLYPicture* pic;
 GLint numPoints;
 
-
+GLfloat currentShear = 0;
 char colorMode = GL_TRUE;
 char idleMode = GL_TRUE;
 GLfloat speedMultiplier = 1.0;
@@ -37,7 +35,7 @@ GLfloat speedMultiplier = 1.0;
 #define ROTATION_INCREMENT    0.5f*speedMultiplier
 #define SCALE_INCREMENT       0.99f*speedMultiplier
 
-
+float twister = 0.0f;
 
 // Make a shear matrix that sheers by h
 mat4 shear(GLfloat h){
@@ -107,18 +105,29 @@ void display( void )
 	// of floating point precision
 
 	// The center of the mesh
-	vec4 at = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2,(pic->max.z + pic->min.z)/2 ,1.0);
-	vec4 eye = vec4(0,0,pic->max.z,1);
-	vec4 up = vec4( 0,  pic->max.y,0    ,1);
-	mat4 camera = Angel::LookAt(eye    ,at,up );
+	vec4 at  = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2,(pic->max.z + pic->min.z)/2 ,1.0);
+	vec4 eye = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2, 2*pic->max.z,1);
+	vec4 up  = vec4(0,  pic->max.y,         0,1);
+	mat4 camera = Angel::LookAt(eye    ,at,up )*Scale(1/pic->max.x);
+	// Page 213
 
 
 
+
+	// Scale from which ever axis was largest
+	mat4 moveToOrigin  = Translate((pic->max.x + pic->min.x)/-2,(pic->max.y + pic->min.y)/-2,(pic->max.z + pic->min.z)/-2 );
+	mat4 scaled =Scale(0.8/max(pic->max.x,pic->max.y, pic->max.z, -pic->min.x, -pic->min.y, -pic->min.z));
+
+
+	camera = scaled*moveToOrigin;
 
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, camera*CTM*ReshapeMat);
+
+
+	glUniform1f(glGetUniformLocation(program,"twist"), twister);
 
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -148,6 +157,7 @@ void initCTM(void){
 	CTM = Angel::identity();
 	stopCTM();
 	ReshapeMat = Angel::identity();
+	currentShear = 0;
 }
 
 
@@ -155,6 +165,7 @@ void initCTM(void){
 // Mat = a motion because it will be the "nextTransformation"
 // cmd is the command key
 char lastCommand = 'q';
+char showRoom = GL_FALSE;
 void toggleTransform(mat4 mat, char cmd){
 	if (cmd == lastCommand){
 		stopCTM();
@@ -172,6 +183,11 @@ void toggleTransform(mat4 mat, char cmd){
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
+	if (key != 'R'){
+		showRoom = GL_FALSE;
+	}
+
+
     switch ( key ) {
 	// Commands that I made up
 	case 'I':
@@ -193,6 +209,12 @@ void keyboard( unsigned char key, int x, int y )
 			speedMultiplier = 0.5;
 			printf("Minimum speed = .5\n");
 		}
+		break;
+	case 'b':
+		printf("CTM: ");
+		printm(CTM);
+		printf("\n reshape: ");
+		printm(ReshapeMat);
 		break;
 	case 'S':
 	case 's':
@@ -230,7 +252,10 @@ void keyboard( unsigned char key, int x, int y )
 
 
 	// Rotational Commands
-	// R
+	case 'R':
+		showRoom = !showRoom;
+		idleMode = GL_TRUE;
+		break;
 
 	// Color Commands
 	//c = toggle between random or red
@@ -247,19 +272,26 @@ void keyboard( unsigned char key, int x, int y )
 	// Shearing
 	case 'h': // h = increment +X shearing
 		ReshapeMat = ReshapeMat*shear( 0.5);
+		currentShear += 0.5;
 		break;
-	case 'H': // H = decrement 
-		ReshapeMat = ReshapeMat*shear(-0.5);
+	case 'H': // H = decrement
+
+		if (currentShear <= 0)	{
+			currentShear = 0;
+		} else {
+			ReshapeMat = ReshapeMat*shear(-0.5);
+			currentShear -= 0.5;
+		}
 		break;
 
 		// Twisting
 	case 't': // t = increment +y twist
-		ReshapeMat = ReshapeMat*twist(1);
+		twister += 0.1;
 		break;
 	case 'T': // T = decrement
-		ReshapeMat = ReshapeMat*twist(-1);
+		twister -= 0.1;
+		if (twister < 0) twister = 0;
 		break;
-
 
 
 	// Changing wireframes
@@ -283,10 +315,11 @@ void keyboard( unsigned char key, int x, int y )
 
 	// Reset
 	case 'W':
-		initCTM();
+		CTM = Angel::identity();
+		stopCTM();
 		break;
 
-	// Quit commands
+	// Quit commandsq
 	case 'q':
 	case 033:
         exit( EXIT_SUCCESS );
@@ -305,8 +338,29 @@ void keyboard( unsigned char key, int x, int y )
 
 
 
+char rotateDirection = -1;
+float rotationProgress = 0;
 // Multiply the current transform matrix by the next transform to do fun stuff!
 void idleTransformations(void){
+	if (showRoom){	
+		nextTransform = RotateY( rotateDirection*ROTATION_INCREMENT);
+		rotationProgress += ROTATION_INCREMENT;
+
+		// After 360 degrees, load next
+		if (rotationProgress >= 360){
+			// Load next picture
+			initCTM();
+			pic = readPLYFile(nextFile());
+			numPoints = pic->numPointsInPicture;
+			drawPLYPicture(pic);
+
+			// Reset tracking variables
+			rotateDirection = rotateDirection*-1;
+			rotationProgress = 0;
+		}
+	}
+	
+	
 	if (idleMode == GL_TRUE){
 		CTM = CTM*nextTransform;
 		display();
@@ -320,7 +374,7 @@ void idleTransformations(void){
 int HW2( int argc, char **argv )
 {
 	
-	genericInit(argc, argv, "Color Cube");
+	genericInit(argc, argv, "Homework2");
 	initCTM();
 
 	shaderSetupTwo();

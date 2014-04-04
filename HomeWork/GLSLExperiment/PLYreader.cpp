@@ -37,7 +37,7 @@ PLYPicture* readPLYFile(char* file){
 	READ_LINE; READ_LINE; // skip two more lines
 
 	PLYPicture* newPLY = generateEmptyPLYPicture( numVertices,  numTriangles);
-	printf("Verts: %d      Tri: %d\n", numVertices, numTriangles);
+//	printf("Verts: %d      Tri: %d\n", numVertices, numTriangles);
 	
 
 	// Points
@@ -66,7 +66,7 @@ PLYPicture* readPLYFile(char* file){
 
 	newPLY->max = maxPt;
 	newPLY->min = minPt;
-	printf("Max: ");	printv(maxPt); printf("\nMin: ");printv(minPt); printf("\n");
+//	printf("Max: ");	printv(maxPt); printf("\nMin: ");printv(minPt); printf("\n");
 
 
 	// Triangles
@@ -113,7 +113,7 @@ char* plyAvailable[43] = { "PLYFiles/airplane.ply",
 "PLYFiles/saratoga.ply",
 "PLYFiles/scissors.ply",
 "PLYFiles/shark.ply",
-"PLYFiles/steeringwheel.ply",
+"PLYFiles/steeringweel.ply",
 "PLYFiles/stratocaster.ply",
 "PLYFiles/street_lamp.ply",
 "PLYFiles/teapot.ply",
