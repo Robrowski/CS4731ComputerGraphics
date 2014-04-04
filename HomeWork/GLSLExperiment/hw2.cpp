@@ -19,7 +19,6 @@ typedef  vec4  point4;
 
 using namespace std;
 
-
 mat4 CTM;
 mat4 ReshapeMat;
 mat4 nextTransform;
@@ -46,51 +45,15 @@ mat4 shear(GLfloat h){
 	return sheared;
 }
 
-// Make a twist matrix that twists by t
-mat4 twist(GLfloat t){
-	mat4 twisted = Angel::RotateY(10);
-
-	twisted[0][1] = .3*t;
-	twisted[2][1] = .3*t;
-	
-	printm(twisted);
-	return twisted;
-}
-
-
-
 
 //----------------------------------------------------------------------------
 // this is where the drawing should happen
 // ASSUME GPU BUFFERS ARE ALREADY LOADED
 void display( void )
 {
-	// remember to enable depth buffering when drawing in 3d
-
-	// TIP1: if you get bogged down with many matrix operations
-	// or need to perform some complexed fitting or solving
-	// it may be time to include some package like diffpac or lapack
-	// http://www.netlib.org/lapack/#_lapack_for_windows
-	// http://www.diffpack.com/
-
-	// TIP2: if you feel that GLSL is too restrictive OpenCL or CUDA can be
-	// used to generate images or other information, they support interface to OpenGL
-	// http://www.khronos.org/registry/cl/
-
-
-
-	// TIP5: take a look at the "Assembly" generated from the opengl compilers, it might lead you to some optimizations
-	// http://http.developer.nvidia.com/Cg/cgc.html
-
-	// avoid using glTranslatex, glRotatex, push and pop
-	// pass your own view matrix to the shader directly
-	// refer to the latest OpenGL documentation for implementation details
-
 	// PROTIP1: You can access the depth buffer value and screen location at each fragment
 	// in the fragment shader, go wild
 
-	// PROTIP2: Render stuff to texture, then run filters on the texture in a second pass to 
-	// produce cool effects
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
 
 	// PROTIP4: Do not set the near and far plane too far appart!
@@ -109,27 +72,22 @@ void display( void )
 	vec4 eye = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2, 2*pic->max.z,1);
 	vec4 up  = vec4(0,  pic->max.y,         0,1);
 	mat4 camera = Angel::LookAt(eye    ,at,up )*Scale(1/pic->max.x);
-	// Page 213
+	// Page 213 from text book
 
 
-
-
-	// Scale from which ever axis was largest
+	// Setting up camera
 	mat4 moveToOrigin  = Translate((pic->max.x + pic->min.x)/-2,(pic->max.y + pic->min.y)/-2,(pic->max.z + pic->min.z)/-2 );
 	mat4 scaled =Scale(0.8/max(pic->max.x,pic->max.y, pic->max.z, -pic->min.x, -pic->min.y, -pic->min.z));
 
-
 	camera = scaled*moveToOrigin;
-
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, camera*CTM*ReshapeMat);
 
-
+	// Send twist values
 	glUniform1f(glGetUniformLocation(program,"twist"), twister);
-
-
+	
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// draw functions should enable then disable the features 
 	// that are specifit the themselves
@@ -139,11 +97,7 @@ void display( void )
     glDrawArrays( GL_TRIANGLES, 0, numPoints ); // = Num triangles * 3
 	glDisable( GL_DEPTH_TEST ); 
 
-
-
-	// use this call to double buffer
 	glutSwapBuffers();
-	// you can implement your own buffers with textures
 }
 
 
@@ -159,7 +113,6 @@ void initCTM(void){
 	ReshapeMat = Angel::identity();
 	currentShear = 0;
 }
-
 
 // If a key is repeated, the motion is stopped. Else, set motion
 // Mat = a motion because it will be the "nextTransformation"
@@ -183,11 +136,9 @@ void toggleTransform(mat4 mat, char cmd){
 // keyboard handler
 void keyboard( unsigned char key, int x, int y )
 {
-	if (key != 'R'){
-		showRoom = GL_FALSE;
-	}
-
-
+	// Always turn this off when a key is pressed
+	showRoom = GL_FALSE;
+	
     switch ( key ) {
 	// Commands that I made up
 	case 'I':
@@ -250,15 +201,13 @@ void keyboard( unsigned char key, int x, int y )
 	COMMAND_CASE( Translate( 0.0,0.0, TRANSLATION_INCREMENT),'Z'); // Translate in positive Z
 	COMMAND_CASE( Translate( 0.0,0.0,-TRANSLATION_INCREMENT),'z');// Translate in negative Z
 
-
 	// Rotational Commands
 	case 'R':
 		showRoom = !showRoom;
 		idleMode = GL_TRUE;
 		break;
 
-	// Color Commands
-	//c = toggle between random or red
+	// Color Commands	//c = toggle between random or red
 	case 'c':
 		colorMode = !colorMode;
 		if (colorMode){
@@ -268,14 +217,12 @@ void keyboard( unsigned char key, int x, int y )
 		 }
 		break;
 
-	
 	// Shearing
 	case 'h': // h = increment +X shearing
 		ReshapeMat = ReshapeMat*shear( 0.5);
 		currentShear += 0.5;
 		break;
 	case 'H': // H = decrement
-
 		if (currentShear <= 0)	{
 			currentShear = 0;
 		} else {
@@ -284,7 +231,7 @@ void keyboard( unsigned char key, int x, int y )
 		}
 		break;
 
-		// Twisting
+	// Twisting
 	case 't': // t = increment +y twist
 		twister += 0.1;
 		break;
@@ -292,7 +239,6 @@ void keyboard( unsigned char key, int x, int y )
 		twister -= 0.1;
 		if (twister < 0) twister = 0;
 		break;
-
 
 	// Changing wireframes
 	case 'N':
@@ -325,7 +271,6 @@ void keyboard( unsigned char key, int x, int y )
         exit( EXIT_SUCCESS );
         break;
     }
-	
 
 	// Idle mode logic
 	if (idleMode != GL_TRUE){
@@ -334,8 +279,6 @@ void keyboard( unsigned char key, int x, int y )
 	}
 	display();
 }
-
-
 
 
 char rotateDirection = -1;
@@ -360,7 +303,7 @@ void idleTransformations(void){
 		}
 	}
 	
-	
+	// Standard continuation of transformations	
 	if (idleMode == GL_TRUE){
 		CTM = CTM*nextTransform;
 		display();
@@ -370,11 +313,9 @@ void idleTransformations(void){
 
 
 //----------------------------------------------------------------------------
-// entry point
 int HW2( int argc, char **argv )
 {
-	
-	genericInit(argc, argv, "Homework2");
+	genericInit(argc, argv, "Homework2: Robert Dabrowski");
 	initCTM();
 
 	shaderSetupTwo();
@@ -383,21 +324,11 @@ int HW2( int argc, char **argv )
 	numPoints = pic->numPointsInPicture;
 	drawPLYPicture(pic);
 
-
 	// assign handlers
     glutDisplayFunc( display );
     glutKeyboardFunc( keyboard );
-	// should add menus
-	// add mouse handler
-	// add resize window functionality (should probably try to preserve aspect ratio)
-
 	glutIdleFunc(idleTransformations);
 
-	// enter the drawing loop
-	// frame rate can be controlled with 
     glutMainLoop();
     return 0;
 }
-
-
-

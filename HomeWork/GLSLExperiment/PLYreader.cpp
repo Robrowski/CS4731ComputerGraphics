@@ -1,10 +1,6 @@
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 
-
-
-
-
 // File reading usefulness
 char plybuf[BUFFER_SIZE];
 #define READ_LINE fgets( plybuf, BUFFER_SIZE,f)
@@ -67,8 +63,7 @@ PLYPicture* readPLYFile(char* file){
 	newPLY->max = maxPt;
 	newPLY->min = minPt;
 //	printf("Max: ");	printv(maxPt); printf("\nMin: ");printv(minPt); printf("\n");
-
-
+	
 	// Triangles
 	for (i = 0; i < numTriangles; i++){
 		unsigned int n, x , y , z;
@@ -81,52 +76,53 @@ PLYPicture* readPLYFile(char* file){
 }
 
 
-char* plyAvailable[43] = { "PLYFiles/airplane.ply",
-"PLYFiles/ant.ply",
-"PLYFiles/apple.ply",
-"PLYFiles/balance.ply",
-"PLYFiles/beethoven.ply",
-"PLYFiles/big_atc.ply",
-"PLYFiles/big_dodge.ply",
-"PLYFiles/big_porsche.ply",
-"PLYFiles/big_spider.ply",
-"PLYFiles/canstick.ply",
-"PLYFiles/chopper.ply",
-"PLYFiles/cow.ply",
-"PLYFiles/dolphins.ply",
-"PLYFiles/egret.ply",
-"PLYFiles/f16.ply",
-"PLYFiles/footbones.ply",
-"PLYFiles/fracttree.ply",
-"PLYFiles/galleon.ply",
-"PLYFiles/hammerhead.ply",
-"PLYFiles/helix.ply",
-"PLYFiles/hind.ply",
-"PLYFiles/kerolamp.ply",
-"PLYFiles/ketchup.ply",
-"PLYFiles/mug.ply",
-"PLYFiles/part.ply",
-"PLYFiles/pickup_big.ply",
-"PLYFiles/pump.ply",
-"PLYFiles/pumpa_tb.ply",
-"PLYFiles/sandal.ply",
-"PLYFiles/saratoga.ply",
-"PLYFiles/scissors.ply",
-"PLYFiles/shark.ply",
-"PLYFiles/steeringweel.ply",
-"PLYFiles/stratocaster.ply",
-"PLYFiles/street_lamp.ply",
-"PLYFiles/teapot.ply",
-"PLYFiles/tennis_shoe.ply",
-"PLYFiles/tommygun.ply",
-"PLYFiles/trashcan.ply",
-"PLYFiles/turbine.ply",
-"PLYFiles/urn2.ply",
-"PLYFiles/walkman.ply",
-"PLYFiles/weathervane.ply" };
+char* plyAvailable[43] = { "PLYFiles/ant.ply",
+	"PLYFiles/apple.ply",
+	"PLYFiles/beethoven.ply",
+	"PLYFiles/big_atc.ply",
+	"PLYFiles/big_dodge.ply",
+	"PLYFiles/big_porsche.ply",
+	"PLYFiles/canstick.ply",
+	"PLYFiles/cow.ply",
+	"PLYFiles/egret.ply",
+	"PLYFiles/f16.ply",
+	"PLYFiles/footbones.ply",
+	"PLYFiles/fracttree.ply",
+	"PLYFiles/hind.ply",
+	"PLYFiles/chopper.ply",
+	"PLYFiles/dolphins.ply",
+	"PLYFiles/hammerhead.ply",
+	"PLYFiles/sandal.ply",
+	"PLYFiles/steeringweel.ply",
+	"PLYFiles/stratocaster.ply",
+	"PLYFiles/street_lamp.ply",
+	"PLYFiles/teapot.ply",
+	"PLYFiles/tennis_shoe.ply",
+	"PLYFiles/urn2.ply",
+	"PLYFiles/tommygun.ply",
+	"PLYFiles/trashcan.ply",
+	"PLYFiles/shark.ply",
+	"PLYFiles/airplane.ply",
+	"PLYFiles/galleon.ply",
+	"PLYFiles/helix.ply",
+	"PLYFiles/kerolamp.ply",
+	"PLYFiles/ketchup.ply",  
+	"PLYFiles/big_spider.ply",
+	"PLYFiles/part.ply",
+	"PLYFiles/pickup_big.ply",
+	"PLYFiles/pumpa_tb.ply",
+	"PLYFiles/saratoga.ply",
+	"PLYFiles/scissors.ply",
+	"PLYFiles/turbine.ply",
+	"PLYFiles/walkman.ply",
+	"PLYFiles/weathervane.ply" ,
+	"PLYFiles/balance.ply",
+	"PLYFiles/mug.ply",
+	"PLYFiles/pump.ply"
+};
 
 
-int currentFile = -1;
+int currentFile = 0;
 char* nextFile(void){
 	currentFile++;
 	if (currentFile >= 43) currentFile = 0;
@@ -139,8 +135,3 @@ char* prevFile(void){
 	if (currentFile < 0) currentFile = 42;
 	return plyAvailable[currentFile];
 }
-
-
-
-
-
