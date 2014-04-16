@@ -67,8 +67,7 @@ void drawPLYPicture(PLYPicture* p){
 	MyPoint* verts = p->points->pt;
 	vec3* triVerts = p->triangles;
 
-	// Prepare buffer
-    glBufferData( GL_ARRAY_BUFFER, sizePoints + sizeColors,  NULL, GL_STATIC_DRAW );
+	
 	
 	// Preparing Data
 	MyPoint* points = (MyPoint *) calloc(numPoints, sizeof(MyPoint)); // holds data
@@ -85,7 +84,10 @@ void drawPLYPicture(PLYPicture* p){
 		points[i + 1] = verts[two];
 		points[i + 2] = verts[three];                 
 	}
-
+	
+	// Prepare buffer
+    glBufferData( GL_ARRAY_BUFFER, sizePoints + sizeColors,  NULL, GL_STATIC_DRAW );
+	
 	// Buffering data  // ACTUALLY SENDS DATA
 	glBufferSubData( GL_ARRAY_BUFFER, 0,          sizePoints, points );
 	glBufferSubData( GL_ARRAY_BUFFER, sizePoints, sizeColors, randomColors(numPoints) );

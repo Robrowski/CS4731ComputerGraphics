@@ -88,6 +88,7 @@
     <ClCompile Include="frame.cpp" />
     <ClCompile Include="geometries.cpp" />
     <ClCompile Include="hw2.cpp" />
+    <ClCompile Include="hw3.cpp" />
     <ClCompile Include="keys.cpp" />
     <ClCompile Include="init.cpp" />
     <ClCompile Include="InitShader.cpp" />

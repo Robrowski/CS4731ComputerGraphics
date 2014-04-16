@@ -82,6 +82,9 @@
     <ClCompile Include="PLYPicture.cpp">
       <Filter>Source Files\Abstractions</Filter>
     </ClCompile>
+    <ClCompile Include="hw3.cpp">
+      <Filter>Source Files\Homework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="textfile.h">
