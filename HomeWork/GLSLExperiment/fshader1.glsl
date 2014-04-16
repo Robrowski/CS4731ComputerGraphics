@@ -7,7 +7,7 @@ out vec4  fColor;
 
 void main() 
 { 
-	//  fColor = fragmentShaderLineColor;
-    fColor = interpolatedColor;
+	fColor = fragmentShaderLineColor;
+    //fColor = interpolatedColor;
 } 
 

@@ -86,7 +86,8 @@ void genericInit( int argc, char **argv, char* window);
 void initGPUBuffers1( void );
 void shaderSetup1( void );
 void shaderSetupTwo( void );
-
+void shaderSetup3( void );
+void enableBuffer(int num); // for multiple buffers
 
 // MyPolyline.cpp
 MyPolyline* generateEmptyPolyline(int size);
@@ -111,7 +112,7 @@ void keyboard1( unsigned char key, int x, int y );
 void setLineColor(vec4 toSet);
 color4* redArray(GLint num);
 color4* randomColors(GLint num);
-
+void setColor(GLint toSet);
 
 // frame.cpp
 #define DEFAULT_WORLD_FRAME newFrame(0,  WINDOW_WIDTH , 0,WINDOW_HEIGHT )
@@ -136,6 +137,7 @@ char* nextFile(void);
 // PLYPicture.cpp
 PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles);
 void drawPLYPicture(PLYPicture* p);
+void drawPLYPicture3(PLYPicture* p, GLint picNum);
 PLYPicture* generatePLYCube(void);
 
 

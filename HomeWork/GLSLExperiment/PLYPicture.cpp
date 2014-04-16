@@ -1,6 +1,9 @@
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 
+
+
+
 // Generates an empty PLY Picture with the given num vertices and triangles - initialized to zero
 PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles){
 	PLYPicture* ply = (PLYPicture*) malloc(sizeof(PLYPicture));
@@ -102,6 +105,44 @@ void drawPLYPicture(PLYPicture* p){
     glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizePoints) );
 
 
+	// Free allocated data
+	free(points); 
+}
+
+
+// Draw the given PLY picture
+// IN PROGRESS
+void drawPLYPicture3(PLYPicture* p, GLint picNum){
+	// Local variables for ezness
+	int numPoints = p->numTriangles*3;
+	int sizePoints = numPoints*sizeof(MyPoint);
+	int sizeColors = numPoints*sizeof(color4);
+	MyPoint* verts = p->points->pt;
+	vec3* triVerts = p->triangles;
+
+	
+	
+	// Preparing Data
+	MyPoint* points = (MyPoint *) calloc(numPoints, sizeof(MyPoint)); // holds data
+	int t; int i = 0; 
+	// for each triangle, copy th three points in
+	for (t = 0; t < p->numTriangles; t++, i+=3 ){
+		// Convert to ints first
+		int one = triVerts[t].x;
+	    int two = triVerts[t].y;
+		int three = triVerts[t].z;
+
+		// Copy vertices
+		points[i]     = verts[one];
+		points[i + 1] = verts[two];
+		points[i + 2] = verts[three];                 
+	}
+	
+	// Prepare buffer
+	enableBuffer(picNum);
+    glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
+	
+	
 	// Free allocated data
 	free(points); 
 }

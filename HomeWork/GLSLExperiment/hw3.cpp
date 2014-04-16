@@ -98,6 +98,16 @@ void display3( void )
 	glUniform1f(glGetUniformLocation(program,"twist"), twister);
 	
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+
+	// TODO:  SEND COLOR                       setColor(index)
+
+
+
+	// TODO: have to resent CTM once for each PLY, + draw arrays once per PLY
+
+
+
 	// draw functions should enable then disable the features 
 	// that are specifit the themselves
 	// the depth is disabled after the draw 
@@ -210,21 +220,6 @@ void keyboard3( unsigned char key, int x, int y )
 	COMMAND_CASE( Translate( 0.0,0.0, TRANSLATION_INCREMENT),'Z'); // Translate in positive Z
 	COMMAND_CASE( Translate( 0.0,0.0,-TRANSLATION_INCREMENT),'z');// Translate in negative Z
 
-	// Rotational Commands
-	case 'R':
-		showRoom = !showRoom;
-		idleMode = GL_TRUE;
-		break;
-
-	// Color Commands	//c = toggle between random or red
-	case 'c':
-		colorMode = !colorMode;
-		if (colorMode){
-			glBufferSubData( GL_ARRAY_BUFFER,  numPoints*sizeof(MyPoint), sizeof(color4)*numPoints, randomColors(numPoints) );
-		 } else{
-			glBufferSubData( GL_ARRAY_BUFFER,  numPoints*sizeof(MyPoint), sizeof(color4)*numPoints, redArray(numPoints) );
-		 }
-		break;
 
 	// Shearing
 	case 'h': // h = increment +X shearing
@@ -290,27 +285,9 @@ void keyboard3( unsigned char key, int x, int y )
 }
 
 
-char rotateDirection = -1;
-float rotationProgress = 0;
 // Multiply the current transform matrix by the next transform to do fun stuff!
 void idleTransformations3(void){
-	if (showRoom){	
-		nextTransform = RotateY( rotateDirection*ROTATION_INCREMENT);
-		rotationProgress += ROTATION_INCREMENT;
 
-		// After 360 degrees, load next
-		if (rotationProgress >= 360){
-			// Load next picture
-			initCTM();
-			pic = readPLYFile(nextFile());
-			numPoints = pic->numPointsInPicture;
-			drawPLYPicture(pic);
-
-			// Reset tracking variables
-			rotateDirection = rotateDirection*-1;
-			rotationProgress = 0;
-		}
-	}
 	
 	// Standard continuation of transformations	
 	if (idleMode == GL_TRUE){
@@ -320,33 +297,45 @@ void idleTransformations3(void){
 	}
 }
 
+
+char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
+	"PLYFiles/footbones.ply",
+	"PLYFiles/tennis_shoe.ply",
+	"PLYFiles/ant.ply",
+	"PLYFiles/beethoven.ply",
+	"PLYFiles/sandal.ply",
+	"PLYFiles/hammerhead.ply",
+	"PLYFiles/urn2.ply",
+	"PLYFiles/stratocaster.ply"
+};
+
+
+
 void initPLYPictures(void){
+	int i;
+	for (i = 0; i < 9 ; i++){
+		pics[i] = *readPLYFile(plyToUse[i]); 	
+		// Call "Draw" function here to load each VBO
+	//	drawPLYPicture3(&pics[i],i);
+	}
+
 	// Top layer
-	pics[0] = *readPLYFile("PLYFiles/big_porsche.ply"); 
 	staticTransforms[0] = Angel::identity(); // no movement!
 
 	// 2nd layer - all have parent of 0
-	pics[1] = *readPLYFile("PLYFiles/footbones.ply");
-	pics[2] = *readPLYFile("PLYFiles/tennis_shoe.ply");
-	pics[3] = *readPLYFile("PLYFiles/ant.ply");
 	//  rotate, then translate in a vector down and out
 	mat4 layer2Translate = Translate(1,-1,0);
-	staticTransforms[1] =   RotateY(0) * 
+	staticTransforms[1] =   RotateY(0) * layer2Translate;
 	staticTransforms[2] = RotateY(120) * layer2Translate;
 	staticTransforms[3] = RotateY(240) * layer2Translate;
 
 	// 3rd layer - each of these goes straight down
-	pics[4] = *readPLYFile("PLYFiles/beethoven.ply"); // parent = 1
-	pics[5] = *readPLYFile("PLYFiles/hammerhead.ply"); // parent = 2
-	pics[6] = *readPLYFile("PLYFiles/sandal.ply"); //parent = 3
 	mat4 straightDown = Translate(0,-1,0);
-	staticTransforms[4] = straightDown;
-	staticTransforms[5] = straightDown;
-	staticTransforms[6] = straightDown;
+	staticTransforms[4] = straightDown; // parent = 1
+	staticTransforms[5] = straightDown; // parent = 2
+	staticTransforms[6] = straightDown; //parent = 3
 
 	// 4th layer - straight down again
-	pics[7] = *readPLYFile("PLYFiles/stratocaster.ply");
-	pics[8] = *readPLYFile("PLYFiles/urn2.ply");
 	staticTransforms[7] = straightDown;
 	staticTransforms[8] = straightDown;
 }
@@ -361,8 +350,11 @@ int HW3( int argc, char **argv )
 	initCTM();
 
 	shaderSetupTwo();
+//  shaderSetup3();
 
 	initPLYPictures();
+	
+
 	numPoints = pics[3].numPointsInPicture;
 	drawPLYPicture(&pics[3]);
 	pic = &pics[3];

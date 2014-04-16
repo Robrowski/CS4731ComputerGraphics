@@ -9,7 +9,7 @@ GLuint program;
 // Specifically for vertex shader and scaling
 GLint ProjLoc;
 GLint colorLoc;
-GLuint buffer;
+GLuint buffer, vbo[9];
 
 /** Basic inits for the general case */
 void genericInit( int argc, char **argv, char* window){
@@ -94,6 +94,38 @@ void shaderSetupTwo(void){
 	 
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
+}
+
+void shaderSetup3(void){
+	// Load shaders and use the resulting shader program
+    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
+    glUseProgram( program );
+
+	
+    // sets the default color to clear screen
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+	
+	// Create a vertex array object
+    GLuint vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao );
+
+	// Trying to do multiple buffers
+    glGenBuffers( 9, vbo );
+    
+	
+	
+	//glBindBuffer( GL_ARRAY_BUFFER, buffer );
 
 
+	// set up vertex arrays
+    GLuint vPosition_loc = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( vPosition_loc );
+    glVertexAttribPointer( vPosition_loc, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+
+}
+
+void enableBuffer(int num){
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[num]);
+	glEnableVertexAttribArray(num); // not sure if this is it.
 }
