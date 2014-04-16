@@ -77,6 +77,8 @@ void display3( void )
 	// of floating point precision
 
 
+	int whichPic = 0;
+
 
 	// Lookin at ---- THIS ISN'T EVEN USED!?!?
 	vec4 at = vec4(0,0,0,1);
@@ -87,7 +89,7 @@ void display3( void )
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM*staticTransforms[0]*staticScales[0]);
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM*staticTransforms[whichPic]*staticScales[whichPic]);
 
 	
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -105,7 +107,7 @@ void display3( void )
 	// the depth is disabled after the draw 
 	// in case you need to draw overlays
 	glEnable( GL_DEPTH_TEST );
-    glDrawArrays( GL_TRIANGLES, 0, numPoints ); // = Num triangles * 3
+		glDrawArrays( GL_TRIANGLES, 0, pics[whichPic].numPointsInPicture ); // = Num triangles * 3
 	glDisable( GL_DEPTH_TEST ); 
 
 	glutSwapBuffers();
@@ -302,25 +304,24 @@ void initPLYPictures(void){
 //----------------------------------------------------------------------------
 int HW3( int argc, char **argv )
 {
-	genericInit(argc, argv, "Homework2: Robert Dabrowski");
+	genericInit(argc, argv, "Homework 3: Robert Dabrowski");
 	initCTM();
 
-	shaderSetupTwo();
-//  shaderSetup3();
+    shaderSetup3();
 
 	initPLYPictures();
 	
 
-	numPoints = pics[0].numPointsInPicture;
+//	drawPLYPicture3(&pics[0], 0);
 	drawPLYPicture(&pics[0]);
-	pic = &pics[0];
 
-	// assign handlers
+	//// assign handlers
     glutDisplayFunc( display3 );
     glutKeyboardFunc( keyboard3 );
-	glutIdleFunc(idleTransformations3);
+	//glutIdleFunc(idleTransformations3);
 
     glutMainLoop();
+	
 	return 0;
 }
 
