@@ -89,21 +89,12 @@ void drawPLYPicture(PLYPicture* p){
 	}
 	
 	// Prepare buffer
-    glBufferData( GL_ARRAY_BUFFER, sizePoints + sizeColors,  NULL, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
 	
-	// Buffering data  // ACTUALLY SENDS DATA
-	glBufferSubData( GL_ARRAY_BUFFER, 0,          sizePoints, points );
-	glBufferSubData( GL_ARRAY_BUFFER, sizePoints, sizeColors, randomColors(numPoints) );
-
 	// set up vertex arrays
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
     glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
-
-//    GLuint vColor = glGetAttribLocation( program, "vColor" ); 
-//    glEnableVertexAttribArray( vColor );
-//    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizePoints) );
-
 
 	// Free allocated data
 	free(points); 
@@ -142,6 +133,12 @@ void drawPLYPicture3(PLYPicture* p, GLint picNum){
 	enableBuffer(picNum);
     glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
 	
+	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( vPosition );
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+
+
+
 	// Free allocated data
 	free(points); 
 }

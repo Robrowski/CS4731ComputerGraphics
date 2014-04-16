@@ -110,19 +110,9 @@ void shaderSetup3(void){
     glBindVertexArray( vao );
 
 	
-
-	// set up vertex arrays
-    GLuint vPosition_loc = glGetAttribLocation( program, "vPosition" );
-    glEnableVertexAttribArray( vPosition_loc );
-    glVertexAttribPointer( vPosition_loc, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
-
-
-	// Trying to do multiple buffers
+    // Trying to do multiple buffers
     glGenBuffers( 9, vbo );
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-//	GLuint tempVBO;
-//	glGenBuffers( 1, &tempVBO);
-//	glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
 }
 
 

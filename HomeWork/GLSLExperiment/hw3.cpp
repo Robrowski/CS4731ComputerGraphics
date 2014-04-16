@@ -312,8 +312,8 @@ int HW3( int argc, char **argv )
 	initPLYPictures();
 	
 
-//	drawPLYPicture3(&pics[0], 0);
-	drawPLYPicture(&pics[0]);
+	drawPLYPicture3(&pics[0], 0);
+//	drawPLYPicture(&pics[0]);
 
 	//// assign handlers
     glutDisplayFunc( display3 );
