@@ -137,7 +137,7 @@ char* nextFile(void);
 // PLYPicture.cpp
 PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles);
 void drawPLYPicture(PLYPicture* p);
-void drawPLYPicture3(PLYPicture* p, GLint picNum);
+void drawPLYPicture3(PLYPicture* p);
 PLYPicture* generatePLYCube(void);
 
 

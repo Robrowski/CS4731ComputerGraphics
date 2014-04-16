@@ -96,10 +96,9 @@ void display3( void )
 
 	// TODO:  SEND COLOR                       setColor(index)
 
-
-
+	drawPLYPicture3(&pics[whichPic]);
 	// TODO: have to resent CTM once for each PLY, + draw arrays once per PLY
-	// enableBuffer(index); // sets teh right buffer to be active
+	
 
 
 	// draw functions should enable then disable the features 
@@ -271,8 +270,6 @@ void initPLYPictures(void){
 	int i;
 	for (i = 0; i < 9 ; i++){
 		pics[i] = *readPLYFile(plyToUse[i]); 	
-		// Call "Draw" function here to load each VBO
-	//	drawPLYPicture3(&pics[i],i);
 		mat4 scaleToFitWindow = Scale(0.8/max(pics[i].max.x,pics[i].max.y, pics[i].max.z, -pics[i].min.x, -pics[i].min.y, -pics[i].min.z)); 
 		staticScales[i] =  scaleToFitWindow*Scale(.3); // Maybe have them bigger?
 	}
@@ -307,13 +304,10 @@ int HW3( int argc, char **argv )
 	genericInit(argc, argv, "Homework 3: Robert Dabrowski");
 	initCTM();
 
-    shaderSetup3();
+    shaderSetupTwo();
 
 	initPLYPictures();
 	
-
-	drawPLYPicture3(&pics[0], 0);
-//	drawPLYPicture(&pics[0]);
 
 	//// assign handlers
     glutDisplayFunc( display3 );

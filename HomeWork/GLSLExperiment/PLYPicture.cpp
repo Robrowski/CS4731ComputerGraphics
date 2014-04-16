@@ -62,6 +62,12 @@ PLYPicture* generatePLYCube(void){
 
 
 // Draw the given PLY picture
+
+
+/// THIS GOT BORKED IN HW3 
+
+/// DEPRECATED - color stuff is gonzo
+
 void drawPLYPicture(PLYPicture* p){
 	// Local variables for ezness
 	int numPoints = p->numTriangles*3;
@@ -103,7 +109,7 @@ void drawPLYPicture(PLYPicture* p){
 
 // Draw the given PLY picture
 // IN PROGRESS
-void drawPLYPicture3(PLYPicture* p, GLint picNum){
+void drawPLYPicture3(PLYPicture* p){
 	// Local variables for ezness
 	int numPoints = p->numTriangles*3;
 	int sizePoints = numPoints*sizeof(MyPoint);
@@ -130,14 +136,12 @@ void drawPLYPicture3(PLYPicture* p, GLint picNum){
 	}
 	
 	// Prepare buffer
-	enableBuffer(picNum);
     glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
 	
+	// Have to do this every time...
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
     glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
-
-
 
 	// Free allocated data
 	free(points); 

@@ -111,12 +111,9 @@ void shaderSetup3(void){
 
 	
     // Trying to do multiple buffers
+	// POOP
     glGenBuffers( 9, vbo );
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 }
 
 
-
-void enableBuffer(int num){
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[num]);
-}
