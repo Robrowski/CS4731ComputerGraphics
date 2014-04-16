@@ -22,6 +22,18 @@ using namespace std;
 // Pre-loaded pictures and static transforms
 PLYPicture pics[9];       // 9 pictures pre-loaded
 mat4 staticTransforms[9]; // static transforms for each layer
+mat4 staticScales[9]; // because scale last
+
+char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
+	"PLYFiles/footbones.ply",
+	"PLYFiles/tennis_shoe.ply",
+	"PLYFiles/ant.ply",
+	"PLYFiles/beethoven.ply",
+	"PLYFiles/sandal.ply",
+	"PLYFiles/hammerhead.ply",
+	"PLYFiles/urn2.ply",
+	"PLYFiles/stratocaster.ply"
+};
 
 
 
@@ -41,16 +53,6 @@ GLfloat speedMultiplier = 1.0;
 #define ROTATION_INCREMENT    0.5f*speedMultiplier
 #define SCALE_INCREMENT       0.99f*speedMultiplier
 
-float twister = 0.0f;
-
-// Make a shear matrix that sheers by h
-mat4 shear(GLfloat h){
-	mat4 sheared = Angel::identity();
-
-	sheared[0][1] = h;
-
-	return sheared;
-}
 
 
 //----------------------------------------------------------------------------
@@ -74,31 +76,21 @@ void display3( void )
 	// also scale your objects appropriatly, dont use scales at the upper or lower bounds
 	// of floating point precision
 
-	// The center of the mesh
-	vec4 at  = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2,(pic->max.z + pic->min.z)/2 ,1.0);
-	//vec4 eye = vec4( (pic->max.x + pic->min.x)/2,(pic->max.y + pic->min.y)/2, 2*pic->max.z,1);
-	//at = vec4(0,0,0,1);
+
+
+	// Lookin at ---- THIS ISN'T EVEN USED!?!?
+	vec4 at = vec4(0,0,0,1);
 	vec4 eye = vec4(0,0,1,1);	
-	vec4 up  = vec4(0,  1, 0,0);
-	mat4 camera = Angel::LookAt(eye    ,at,up ); //*Scale(1/pic->max.x);
-	// Page 213 from text book
+	vec4 up  = vec4(0,  1, 0,0);     
+	mat4 camera = Angel::LookAt(eye    ,at,up ); 	// Page 213 from text book
 
-
-	// Setting up camera
-	mat4 moveToOrigin  = Translate((pic->max.x + pic->min.x)/-2,(pic->max.y + pic->min.y)/-2,(pic->max.z + pic->min.z)/-2 );
-	mat4 scaled =Scale(0.8/max(pic->max.x,pic->max.y, pic->max.z, -pic->min.x, -pic->min.y, -pic->min.z));
-
-	//camera = scaled*moveToOrigin;
 
 	// set up projection matricies
 	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, scaled*camera*CTM*ReshapeMat);
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, CTM*staticTransforms[0]*staticScales[0]);
 
-	// Send twist values
-	glUniform1f(glGetUniformLocation(program,"twist"), twister);
 	
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
 
 	// TODO:  SEND COLOR                       setColor(index)
 
@@ -183,8 +175,7 @@ void keyboard3( unsigned char key, int x, int y )
 	case 'b':
 		printf("CTM: ");
 		printm(CTM);
-		printf("\n reshape: ");
-		printm(ReshapeMat);
+	
 		break;
 	case 'S':
 	case 's':
@@ -195,13 +186,7 @@ void keyboard3( unsigned char key, int x, int y )
 		printf("Not Implemented! \n");
 		break;
 
-	// Because I wanted to do scale too
-	case 'L': 
-		ReshapeMat = ReshapeMat*Scale(1/SCALE_INCREMENT);
-		break;
-	case 'l': 
-		ReshapeMat = ReshapeMat*Scale(  SCALE_INCREMENT);
-		break;
+
 
 	// My BETTER rotational commands
 	COMMAND_CASE( RotateX( ROTATION_INCREMENT),'D');
@@ -221,28 +206,6 @@ void keyboard3( unsigned char key, int x, int y )
 	COMMAND_CASE( Translate( 0.0,0.0,-TRANSLATION_INCREMENT),'z');// Translate in negative Z
 
 
-	// Shearing
-	case 'h': // h = increment +X shearing
-		ReshapeMat = ReshapeMat*shear( 0.5);
-		currentShear += 0.5;
-		break;
-	case 'H': // H = decrement
-		if (currentShear <= 0)	{
-			currentShear = 0;
-		} else {
-			ReshapeMat = ReshapeMat*shear(-0.5);
-			currentShear -= 0.5;
-		}
-		break;
-
-	// Twisting
-	case 't': // t = increment +y twist
-		twister += 0.1;
-		break;
-	case 'T': // T = decrement
-		twister -= 0.1;
-		if (twister < 0) twister = 0;
-		break;
 
 	// Changing wireframes
 	case 'N':
@@ -298,16 +261,7 @@ void idleTransformations3(void){
 }
 
 
-char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
-	"PLYFiles/footbones.ply",
-	"PLYFiles/tennis_shoe.ply",
-	"PLYFiles/ant.ply",
-	"PLYFiles/beethoven.ply",
-	"PLYFiles/sandal.ply",
-	"PLYFiles/hammerhead.ply",
-	"PLYFiles/urn2.ply",
-	"PLYFiles/stratocaster.ply"
-};
+
 
 
 
@@ -317,10 +271,15 @@ void initPLYPictures(void){
 		pics[i] = *readPLYFile(plyToUse[i]); 	
 		// Call "Draw" function here to load each VBO
 	//	drawPLYPicture3(&pics[i],i);
+		mat4 scaleToFitWindow = Scale(0.8/max(pics[i].max.x,pics[i].max.y, pics[i].max.z, -pics[i].min.x, -pics[i].min.y, -pics[i].min.z)); 
+		staticScales[i] =  scaleToFitWindow*Scale(.3); // Maybe have them bigger?
 	}
 
 	// Top layer
-	staticTransforms[0] = Angel::identity(); // no movement!
+	staticTransforms[0] = Translate(0,0.8,0); // no movement!
+
+
+
 
 	// 2nd layer - all have parent of 0
 	//  rotate, then translate in a vector down and out
@@ -355,9 +314,9 @@ int HW3( int argc, char **argv )
 	initPLYPictures();
 	
 
-	numPoints = pics[3].numPointsInPicture;
-	drawPLYPicture(&pics[3]);
-	pic = &pics[3];
+	numPoints = pics[0].numPointsInPicture;
+	drawPLYPicture(&pics[0]);
+	pic = &pics[0];
 
 	// assign handlers
     glutDisplayFunc( display3 );

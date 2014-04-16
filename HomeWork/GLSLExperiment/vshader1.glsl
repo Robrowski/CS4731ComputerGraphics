@@ -22,18 +22,19 @@ void main()
   // of the overall projection
   //mat4 rot = Rotate(twist);
  
- float angles = radians( twist*vPosition.y);
+// float angles = radians( twist*vPosition.y);
  
- float c = cos( angles );
- float s = sin( angles );
- mat4 rot = mat4( c,   0.0, s, 0.0,
-				  0.0, 1.0, 0.0, 0.0,
-				 -s, 0.0, c, 0.0,
-			      0.0, 0.0, 0.0, 1.0 );
+ // float c = cos( angles );
+ // float s = sin( angles );
+ // mat4 rot = mat4( c,   0.0, s, 0.0,
+				  // 0.0, 1.0, 0.0, 0.0,
+				 // -s, 0.0, c, 0.0,
+			      // 0.0, 0.0, 0.0, 1.0 );
 
-
-  gl_Position = CTM*rot*vPosition;
-  interpolatedColor = vColor;
+  gl_Position = CTM*vPosition;
+  
+  //gl_Position = CTM*rot*vPosition;
+//  interpolatedColor = vColor;
   
   // Old
  //  gl_Position = Proj*model_matrix*vPosition;
