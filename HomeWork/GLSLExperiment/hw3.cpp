@@ -97,7 +97,7 @@ void display3( void )
 
 
 	// TODO: have to resent CTM once for each PLY, + draw arrays once per PLY
-
+	// enableBuffer(index); // sets teh right buffer to be active
 
 
 	// draw functions should enable then disable the features 
@@ -276,10 +276,7 @@ void initPLYPictures(void){
 	}
 
 	// Top layer
-	staticTransforms[0] = Translate(0,0.8,0); // no movement!
-
-
-
+	staticTransforms[0] = Translate(0,0.8,0); // moved to top
 
 	// 2nd layer - all have parent of 0
 	//  rotate, then translate in a vector down and out

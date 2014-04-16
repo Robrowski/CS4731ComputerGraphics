@@ -9,7 +9,7 @@ GLuint program;
 // Specifically for vertex shader and scaling
 GLint ProjLoc;
 GLint colorLoc;
-GLuint buffer, vbo[9];
+GLuint buffer, vbo[9];  // SO far, 9 PLY pictures.. could add a VBO for lines?
 
 /** Basic inits for the general case */
 void genericInit( int argc, char **argv, char* window){
@@ -125,7 +125,14 @@ void shaderSetup3(void){
 
 }
 
+
+
 void enableBuffer(int num){
+	int i;
+	for (i= 0; i < 9; i++){
+		glDisableVertexAttribArray(i);
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[num]);
 	glEnableVertexAttribArray(num); // not sure if this is it.
 }
