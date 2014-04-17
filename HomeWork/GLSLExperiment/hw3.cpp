@@ -1,4 +1,4 @@
-// HW 2. 
+// HW 3. 
 // Robert Dabrowski   rpdabrowski@wpi.edu
 
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
@@ -54,7 +54,7 @@ GLfloat speedMultiplier = 1.0;
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT//*DEG_TO_RAD
 #define SCALE_INCREMENT       0.99f*speedMultiplier
 #define SLIDE_INC .01
-
+GLfloat meshYRotate = 0;
 
 void drawAPic(GLint n){
 	drawPLYPicture3(&pics[n]);
@@ -72,7 +72,7 @@ mat4 MyLookAt(void )
 {
 	// Starting points and vector
 	vec4 at =  vec4(0,0,0 ,1);
-	vec4 eye = vec4(0,0,1 ,1);	  
+	vec4 eye = vec4(0,0,.3 ,1);	  
 	vec4 up = vec4(0,1,0,0);
 
 	// Math stolen from Angel::LookAt
@@ -143,27 +143,45 @@ void display3( void )
 	// also scale your objects appropriatly, dont use scales at the upper or lower bounds
 	// of floating point precision
 
-	mat4 cam_ctm = Translate(delU, delV, delN)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch); // Alternate method that is meh
-	printf("Matrix shit");
-	printm(cam_ctm);
-	mat4 camera = MyLookAt( ); 
-	printf("Lookat");
-	printm(camera);
-	cam_ctm = camera;
-	
-	// CTM will be fore moving individual parts?!?!
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, cam_ctm*staticTransforms[whichPic]*staticScales[whichPic]); 
-	drawAPic(whichPic );
 
-	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, cam_ctm*staticTransforms[whichPic+1]*staticTransforms[whichPic]*staticScales[whichPic+1]);
-	drawAPic(whichPic + 1);
+
+
+	
+
+	/**********************************************************************
+	MATRIX STACK HERE Fun part of pushing and popping as we go through matrix stack
+	***********************************************************************/
+	mat4 nextMat;
+	mat4 yRot = RotateY(meshYRotate);
+	resetMatrixStack();
+	// Might as well put camera on the stack	
+	// Prepratory transformation matrics
+	mat4 cam_ctm = Translate(delU, delV, delN)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch); // Alternate method that is meh 
+//	pushMatrix(cam_ctm); // i dont like this camera as much 
+	pushMatrix(MyLookAt( ));
+	
+	
+	
+	// LAYER 0
+	whichPic = 0;
+	for (whichPic = 0; whichPic < 9; whichPic++){
+		pushMatrix( peekMatrix()*staticTransforms[whichPic]*yRot);
+		printm(peekMatrix());
+		nextMat = peekMatrix()*staticScales[whichPic]*CTM;
+		// CTM will be fore moving individual parts?!?!
+		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat); 
+		drawAPic(whichPic );
+	}
+
+
+
+//	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, cam_ctm*staticTransforms[whichPic+1]*staticTransforms[whichPic]*staticScales[whichPic+1]*CTM);
+//	drawAPic(whichPic + 1);
 
 
 
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
-
-
 }
 
 
@@ -214,11 +232,6 @@ void keyboard3( unsigned char key, int x, int y )
 		printm(CTM);
 	
 		break;
-	case 'S':
-	case 's':
-		printf("Stopping the Object\n");
-		nextTransform = Angel::identity();
-		break;
 	default:
 		printf("Not Implemented! \n");
 		break;
@@ -265,10 +278,7 @@ void keyboard3( unsigned char key, int x, int y )
 		delN = 0; delU = 0; delV = 0;
 		break;
 
-
-
-
-	// Quit commandsq
+	// Quit commands
 	case 'q':
 	case 033:
         exit( EXIT_SUCCESS );
@@ -284,14 +294,11 @@ void keyboard3( unsigned char key, int x, int y )
 
 // Multiply the current transform matrix by the next transform to do fun stuff!
 void idleTransformations3(void){
-
+	meshYRotate += 0.05f;
 	
-	// Standard continuation of transformations	
-	//if (idleMode == GL_TRUE){
-		CTM = CTM*nextTransform;
-		display3();
-		glutPostRedisplay(); //?
-//	}
+	CTM = CTM*nextTransform;
+	glutPostRedisplay(); //?
+
 }
 
 
@@ -304,28 +311,30 @@ void initPLYPictures(void){
 	for (i = 0; i < 9 ; i++){
 		pics[i] = *readPLYFile(plyToUse[i]); 	
 		mat4 scaleToFitWindow = Scale(0.8/max(pics[i].max.x,pics[i].max.y, pics[i].max.z, -pics[i].min.x, -pics[i].min.y, -pics[i].min.z)); 
-		staticScales[i] =  scaleToFitWindow*Scale(.3); // Maybe have them bigger?
+		staticScales[i] =  scaleToFitWindow*Scale(.2); // Maybe have them bigger?
 	}
 
+	mat4 downLeft  = Translate(.4,-.3,0);
+	mat4 downRight = Translate(-.4,-.3,0);
+	
 	// Top layer
 	staticTransforms[0] = Translate(0,0.8,0); // moved to top
 
 	// 2nd layer - all have parent of 0
-	//  rotate, then translate in a vector down and out
-	mat4 layer2Translate = Translate(.4,-.4,0);
-	staticTransforms[1] =   RotateY(0) * layer2Translate;
-	staticTransforms[2] = RotateY(120) * layer2Translate;
-	staticTransforms[3] = RotateY(240) * layer2Translate;
+	staticTransforms[1] =   downLeft;
+	staticTransforms[8] =  downRight;
 
-	// 3rd layer - each of these goes straight down
-	mat4 straightDown = Translate(0,-1,0);
-	staticTransforms[4] = straightDown; // parent = 1
-	staticTransforms[5] = straightDown; // parent = 2
-	staticTransforms[6] = straightDown; //parent = 3
+	// 3rd layer parent = 1
+	staticTransforms[2] = downLeft; 
+	staticTransforms[3] = downRight;
 
-	// 4th layer - straight down again
-	staticTransforms[7] = straightDown;
-	staticTransforms[8] = straightDown;
+	// 4th layer - parent = 3
+	staticTransforms[7] = downLeft;
+	staticTransforms[4] = downRight;
+
+	// 5th layer - parent = 4
+	staticTransforms[5] = downLeft; 
+	staticTransforms[6] = downRight;
 }
 
 
@@ -339,11 +348,13 @@ int HW3( int argc, char **argv )
 
     shaderSetupTwo();
 	initPLYPictures();
+	initMatrixStack(10); // extra big
+
 
 	//// assign handlers
     glutDisplayFunc( display3 );
     glutKeyboardFunc( keyboard3 );
-	//glutIdleFunc(idleTransformations3);
+	glutIdleFunc(idleTransformations3);
 
     glutMainLoop();
 	

@@ -93,6 +93,7 @@
     <ClCompile Include="init.cpp" />
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="matrixStack.cpp" />
     <ClCompile Include="MyPicture.cpp" />
     <ClCompile Include="MyPolyline.cpp" />
     <ClCompile Include="PLYPicture.cpp" />

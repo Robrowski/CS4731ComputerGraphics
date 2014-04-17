@@ -46,8 +46,8 @@ extern GLint ProjLoc;
 extern GLint colorLoc;
 
 // Default world window
-#define WINDOW_WIDTH  1000 //640
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH  900 //640
+#define WINDOW_HEIGHT WINDOW_WIDTH
 #define FIFTY_MILLION 50*1000*1000
 #define ONE_MILLION      1000*1000
 
@@ -144,6 +144,13 @@ PLYPicture* generatePLYCube(void);
 void drawFern(int iterations);
 void drawGingerBreadMan(int iterations);
 void drawSierpinski(void);
+
+// matrixStack.cpp
+void initMatrixStack(GLint newSize);
+void pushMatrix(mat4 m);
+mat4 peekMatrix(void);
+mat4 popMatrix(void);
+void resetMatrixStack(void);
 
 
 // hw1.cpp

@@ -85,6 +85,9 @@
     <ClCompile Include="hw3.cpp">
       <Filter>Source Files\Homework</Filter>
     </ClCompile>
+    <ClCompile Include="matrixStack.cpp">
+      <Filter>Source Files\Abstractions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="textfile.h">
