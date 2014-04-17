@@ -42,6 +42,8 @@ GLuint ctmMatrix;
 #define SLIDE_INC .01
 
 
+GLfloat links[9];
+
 // Helper to draw a pic by number - handles relative transformations
 // Pushes current transformation and assumes previous + camera are on stack
 void drawAPic(GLint n){
@@ -50,11 +52,32 @@ void drawAPic(GLint n){
 
 	pushMatrix( peekMatrix()*staticTransforms[n]);
 	// stuff in nextMat doesn't get pushed.. but could
-	mat4 nextMat = peekMatrix()*RotateY(meshYRotate)*staticScales[n]*sinusoidTrans;
+	mat4 nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans;
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
 
 	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
+
+	// Drawing Connecting links
+	MyPoint pts[4];
+	pts[0] = MyPoint(0,0,0,1);
+	pts[1] = MyPoint(0,.3,0,1);
+	pts[2] = MyPoint(0,.3,0,1);
+	pts[3] = MyPoint(links[n],.3,0,1);
+	
+	// Draw links, but not for the top one.
+	if (n > 0){
+		// Prepare buffer
+		glBufferData( GL_ARRAY_BUFFER, sizeof(pts) ,  pts, GL_STATIC_DRAW );
+	
+		// Have to do this every time...
+		GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+		glEnableVertexAttribArray( vPosition );
+		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+	
+		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, peekMatrix()*Translate(0,sin(sinusoidModeAngle)*SINUSOID_AMP*.02 ,0));
+		glDrawArrays(GL_LINES,0,4);
+	}
 
 	// Handy place to draw extents
 	if (extentMode){
@@ -202,6 +225,10 @@ void display3( void )
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
 	
+	 
+
+
+
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
 }
@@ -227,8 +254,8 @@ void keyboard3( unsigned char key, int x, int y )
 		break;
 	
 	// Slider camera
-	case 'N': delN += SLIDE_INC; break;
-	case 'n': delN -= SLIDE_INC; printf("delN: %f\n",delN); break;
+	case 'N': delN += SLIDE_INC*5; break;
+	case 'n': delN -= SLIDE_INC*5; printf("delN: %f\n",delN); break;
 	case 'V': delV += SLIDE_INC; break;
 	case 'v': delV -= SLIDE_INC; break;
 	case 'U': delU += SLIDE_INC; break;
@@ -291,34 +318,44 @@ void initPLYPictures(void){
 
 	// Top layer
 	staticTransforms[0] = Translate(0,0.8,0); // moved to top
+	links[0] = 0;
 
 	// 2nd layer - all have parent of 0
 	float rotationRadius = .65;
 	staticTransforms[1] =    Translate(rotationRadius*.5,-.3,0);
 	staticScales[1] *= Scale(.75); // foot
+	links[1] = -rotationRadius*.5;
 	staticTransforms[8] =    Translate(-rotationRadius*.5,-.3,0);
 	staticScales[8] *= Scale(1.5); // stratocaster
+	links[8] = rotationRadius;
+
 
 	// 3rd layer parent = 1
 	rotationRadius *= .5;
 	staticTransforms[2] = Translate(rotationRadius,-.3,0); 
 	staticScales[2] *= Scale(.65); // tennishoe	
+	links[2] = -rotationRadius;
 	staticTransforms[3] = Translate(-rotationRadius, -.3,0);
 	staticScales[3] *= Scale(.5); // ant
+	links[3] = rotationRadius;
 
 	// 4th layer - parent = 3
 	rotationRadius *= .4;
 	staticTransforms[7] = Translate(rotationRadius,-.3,0);
 	staticScales[7] *= Scale(.4); // urn
+	links[7] = -rotationRadius;
 	staticTransforms[4] = Translate(-rotationRadius,-.3,0);
 	staticScales[4] *= Scale(.4); // beethoven
-	
+	links[4] = rotationRadius;
+
 	// 5th layer - parent = 4
 	//rotationRadius *= .5;
 	staticTransforms[5] = Translate(rotationRadius,-.3,0);
 	staticScales[5] *= Scale(.6); // sandal
+	links[5] = -rotationRadius;
 	staticTransforms[6] = Translate(-rotationRadius,-.3,0);
 	staticScales[6] *= Scale(.7);// hammerhead
+	links[6] = rotationRadius;
 }
 
 
