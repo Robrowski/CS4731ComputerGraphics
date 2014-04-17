@@ -77,8 +77,7 @@ void drawAPic(GLint n){
 
 	// Handy place to draw extents
 	if (extentMode){
-		mat4 extentMat = nextMat*RotateY(-meshYRotate);
-		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, extentMat);
+		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
 		MyPoint points[14];
 		MyPoint max = pics[n].max;
 		MyPoint min = pics[n].min;
@@ -95,8 +94,9 @@ void drawAPic(GLint n){
 		points[9 ] = MyPoint(  max.x,  min.y,  min.z, 1.0f); 
 		points[10] = MyPoint(  max.x,  max.y,  min.z, 1.0f); 
 		points[11] = max;
-		points[12] = MyPoint(  max.x,  max.y,  max.z, 1.0f); 
+		points[12] = MyPoint(  min.x,  max.y,  max.z, 1.0f); 
 		points[13] = MyPoint(  min.x,  max.y,  min.z, 1.0f); 
+
 
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(points) ,  points, GL_STATIC_DRAW );
@@ -256,12 +256,12 @@ void keyboard3( unsigned char key, int x, int y )
 
 	case 's':
 	case 'S':
-		sinusoidMode = ~sinusoidMode;
+		sinusoidMode = !sinusoidMode;
 		break;
 	
 	case 'e':
 	case 'E':
-		extentMode = ~extentMode;
+		extentMode = !extentMode;
 		break;
 	
 	// Slider camera
@@ -353,8 +353,9 @@ void initPLYPictures(void){
 	// 5th layer - parent = 4
 	rotationRadius *= .5;
 	staticTransforms[5] = Translate(rotationRadius,-.3,0);
-	staticScales[5] *= Scale(.4); // sandal
+	staticScales[5] *= Scale(.6); // sandal
 	staticTransforms[6] = Translate(-rotationRadius,-.3,0);
+	staticScales[6] *= Scale(.7);// hammerhead
 }
 
 
