@@ -116,9 +116,7 @@ void drawPLYPicture3(PLYPicture* p){
 	int sizeColors = numPoints*sizeof(color4);
 	MyPoint* verts = p->points->pt;
 	vec3* triVerts = p->triangles;
-
-	
-	
+		
 	// Preparing Data
 	MyPoint* points = (MyPoint *) calloc(numPoints, sizeof(MyPoint)); // holds data
 	int t; int i = 0; 

@@ -96,24 +96,4 @@ void shaderSetupTwo(void){
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
 }
 
-void shaderSetup3(void){
-	// Load shaders and use the resulting shader program
-    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
-    glUseProgram( program );
-	
-    // sets the default color to clear screen
-    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
-	
-	// Create a vertex array object
-    GLuint vao;
-    glGenVertexArrays( 1, &vao );
-    glBindVertexArray( vao );
-
-	
-    // Trying to do multiple buffers
-	// POOP
-    glGenBuffers( 9, vbo );
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-}
-
 

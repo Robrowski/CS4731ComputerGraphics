@@ -12,8 +12,8 @@ color4 colorsAvailable[NUM_AVAILABLE_COLORS] = {
 	color4( 0.0, 1.0, 0.0, 1.0 ),  // green
     color4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
     color4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-	color4( 1.0, 0.2, 0.7, 1.0 ),
-	color4( 1.0, 0.2, 0.2, 1.0 ),
+	color4( 0.5, 0.2, 0.7, 1.0 ), //shark
+	color4( 0.8, 0.4, 0.2, 1.0 ),
 	color4( 0.7, 0.7, 0.0, 1.0 ),
 	color4( 0.2, 0.7, 0.2, 1.0 ),
     color4( 1.0, 1.0, 1.0, 1.0 ),  // white

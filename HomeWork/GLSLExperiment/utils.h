@@ -87,7 +87,6 @@ void initGPUBuffers1( void );
 void shaderSetup1( void );
 void shaderSetupTwo( void );
 void shaderSetup3( void );
-void enableBuffer(int num); // for multiple buffers
 
 // MyPolyline.cpp
 MyPolyline* generateEmptyPolyline(int size);
