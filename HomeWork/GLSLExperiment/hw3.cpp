@@ -26,6 +26,7 @@ GLfloat sinusoidModeAngle = 0;
 PLYPicture pics[9];       // 9 pictures pre-loaded
 mat4 staticTransforms[9]; // static transforms for each layer
 mat4 staticScales[9]; // because scale last
+GLfloat links[9];  // coordinate of top of link
 
 // Location of CTM in vertex shader
 GLuint ctmMatrix;
@@ -41,8 +42,6 @@ GLuint ctmMatrix;
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
 
-
-GLfloat links[9];
 
 // Helper to draw a pic by number - handles relative transformations
 // Pushes current transformation and assumes previous + camera are on stack
@@ -81,8 +80,8 @@ void drawAPic(GLint n){
 
 	// Handy place to draw extents
 	if (extentMode){
-		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
-		MyPoint points[14];
+		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, peekMatrix()*staticScales[n]*sinusoidTrans);
+		MyPoint points[24];
 		MyPoint max = pics[n].max;
 		MyPoint min = pics[n].min;
 
@@ -101,6 +100,10 @@ void drawAPic(GLint n){
 		points[11] = max;
 		points[12] = MyPoint(  min.x,  max.y,  max.z, 1.0f); 
 		points[13] = MyPoint(  min.x,  max.y,  min.z, 1.0f); 
+		points[14] = MyPoint(  min.x,  max.y,  max.z, 1.0f);
+		points[15] = MyPoint(  min.x,  min.y,  max.z, 1.0f); 
+		points[16] = MyPoint(  max.x,  min.y,  max.z, 1.0f);
+		points[17] = MyPoint(  max.x,  min.y,  min.z, 1.0f);
 
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(points) ,  points, GL_STATIC_DRAW );
@@ -110,7 +113,7 @@ void drawAPic(GLint n){
 		glEnableVertexAttribArray( vPosition );
 		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
 
-		glDrawArrays( GL_LINE_LOOP, 0, 14 );
+		glDrawArrays( GL_LINE_LOOP, 0, 18 );
 	}
 }
 
@@ -225,9 +228,6 @@ void display3( void )
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
 	
-	 
-
-
 
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
