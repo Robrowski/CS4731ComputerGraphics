@@ -4,56 +4,42 @@
 #include "Angel.h"  // Angel.h is homegrown include file, which also includes glew and freeglut
 #include "utils.h"
 #include <stdlib.h>
-
+using namespace std;
 //----------------------------------------------------------------------------
-
-
+// Camera Position variables
 GLfloat delU = 0;
 GLfloat delV = 0;
 GLfloat delN = 0;
 GLfloat pitch = 0;
 GLfloat roll = 0;
 GLfloat yaw = 0;
+
+// The degrees each mesh should have turned
+GLfloat meshYRotate = 0;
+
+// Modes
 bool extentMode = false;
 bool sinusoidMode = false;
 GLfloat sinusoidModeAngle = 0;
-#define MESH_Y_ROT_INC 0.5f
-#define SINUSOID_INC   0.1f
-#define SINUSOID_AMP   0.25f
-
-
-
-using namespace std;
 
 // Pre-loaded pictures and static transforms
 PLYPicture pics[9];       // 9 pictures pre-loaded
 mat4 staticTransforms[9]; // static transforms for each layer
 mat4 staticScales[9]; // because scale last
 
-char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
-	"PLYFiles/footbones.ply",
-	"PLYFiles/tennis_shoe.ply",
-	"PLYFiles/ant.ply",
-	"PLYFiles/beethoven.ply",
-	"PLYFiles/sandal.ply",
-	"PLYFiles/hammerhead.ply",
-	"PLYFiles/urn2.ply",
-	"PLYFiles/stratocaster.ply"
-};
-
-
+// Location of CTM in vertex shader
 GLuint ctmMatrix;
 
+// Regular Constants
+#define DEG_TO_RAD          M_PI/180
 
-
-GLfloat speedMultiplier = 1.0;
-#define DEG_TO_RAD M_PI/180
-#define TRANSLATION_INCREMENT 0.01f*speedMultiplier
-#define ROTATION_INCREMENT    2 
-#define CAM_ROT_INC                (-1)*ROTATION_INCREMENT//*DEG_TO_RAD
-#define SCALE_INCREMENT       0.99f*speedMultiplier
+// Tuning Constants
+#define MESH_Y_ROT_INC 0.5f
+#define SINUSOID_INC   0.1f
+#define SINUSOID_AMP   0.25f
+#define ROTATION_INCREMENT    2 // degrees
+#define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
-GLfloat meshYRotate = 0;
 
 
 // Helper to draw a pic by number - handles relative transformations
@@ -68,7 +54,7 @@ void drawAPic(GLint n){
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
 
 	setColor(n);
-	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); // = Num triangles * 3
+	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
 
 	// Handy place to draw extents
 	if (extentMode){
@@ -92,7 +78,6 @@ void drawAPic(GLint n){
 		points[11] = max;
 		points[12] = MyPoint(  min.x,  max.y,  max.z, 1.0f); 
 		points[13] = MyPoint(  min.x,  max.y,  min.z, 1.0f); 
-
 
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(points) ,  points, GL_STATIC_DRAW );
@@ -157,7 +142,6 @@ mat4 MyLookAt(void )
 	GLfloat ey = eye.y + delU*u.y + delV*v.y + delN*n.y;
 	GLfloat ez = eye.z + delU*u.z + delV*v.z + delN*n.z;
 	vec4 eyeSlide = vec4( ex, ey,ez,1);
-
 
     mat4 c = mat4(u, v, n, t);
     return c * Translate( -eyeSlide );
@@ -284,6 +268,17 @@ void idleTransformations3(void){
 }
 
 
+char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
+	"PLYFiles/footbones.ply",
+	"PLYFiles/tennis_shoe.ply",
+	"PLYFiles/ant.ply",
+	"PLYFiles/beethoven.ply",
+	"PLYFiles/sandal.ply",
+	"PLYFiles/hammerhead.ply",
+	"PLYFiles/urn2.ply",
+	"PLYFiles/stratocaster.ply"
+};
+
 // Read PLY files and set some static tranformation stuff for later
 void initPLYPictures(void){
 	int i;
@@ -345,8 +340,3 @@ int HW3( int argc, char **argv )
 	
 	return 0;
 }
-
-
-
-
-

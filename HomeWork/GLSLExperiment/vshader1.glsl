@@ -1,13 +1,13 @@
 #version 150
 
-uniform mat4 Proj;
-uniform mat4 model_matrix;
+//uniform mat4 Proj;  //deprecated
+//uniform mat4 model_matrix; //deprecated
 uniform mat4 CTM;
-uniform float twist;
+//uniform float twist; //deprecated
 
 in  vec4 vPosition;
-in  vec4 vColor;
-out vec4 interpolatedColor;
+//in  vec4 vColor; //deprecated
+//out vec4 interpolatedColor; //deprecated
 
 void main() 
 {
@@ -22,10 +22,10 @@ void main()
   // of the overall projection
   //mat4 rot = Rotate(twist);
  
-// float angles = radians( twist*vPosition.y);
+// float angles = radians( twist*vPosition.y); //deprecated
  
- // float c = cos( angles );
- // float s = sin( angles );
+ // float c = cos( angles ); //deprecated
+ // float s = sin( angles ); //deprecated
  // mat4 rot = mat4( c,   0.0, s, 0.0,
 				  // 0.0, 1.0, 0.0, 0.0,
 				 // -s, 0.0, c, 0.0,
@@ -33,11 +33,11 @@ void main()
 
   gl_Position = CTM*vPosition;
   
-  //gl_Position = CTM*rot*vPosition;
-//  interpolatedColor = vColor;
+  //gl_Position = CTM*rot*vPosition; //deprecated
+//  interpolatedColor = vColor; //deprecated
   
-  // Old
- //  gl_Position = Proj*model_matrix*vPosition;
- // gl_Position = Proj*vPosition;
+  // Old //deprecated
+ //  gl_Position = Proj*model_matrix*vPosition; //deprecated
+ // gl_Position = Proj*vPosition; //deprecated
   
 } 
