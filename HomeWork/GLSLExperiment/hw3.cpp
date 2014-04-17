@@ -18,8 +18,12 @@ GLfloat delN = 0;
 GLfloat pitch = 0;
 GLfloat roll = 0;
 GLfloat yaw = 0;
-
-
+bool extentMode = false;
+bool sinusoidMode = false;
+GLfloat sinusoidModeAngle = 0;
+#define MESH_Y_ROT_INC 0.5f
+#define SINUSOID_INC   0.1f
+#define SINUSOID_AMP   0.25f
 
 typedef  vec4  point4;
 
@@ -43,7 +47,7 @@ char* plyToUse[9] = { "PLYFiles/big_porsche.ply",
 
 
 int whichPic = 0;
-
+GLuint ctmMatrix;
 mat4 CTM, nextTransform;
 
 
@@ -56,10 +60,54 @@ GLfloat speedMultiplier = 1.0;
 #define SLIDE_INC .01
 GLfloat meshYRotate = 0;
 
+
+// Helper to draw a pic by number - handles relative transformations
+// Pushes current transformation and assumes previous + camera are on stack
 void drawAPic(GLint n){
-	drawPLYPicture3(&pics[n]);
+	drawPLYPicture3(&pics[n]); // someday swap this out to just swap VBO's
+	mat4 sinusoidTrans = Translate(0,sin(sinusoidModeAngle)*SINUSOID_AMP ,0);
+
+	pushMatrix( peekMatrix()*staticTransforms[n]*RotateY(meshYRotate));
+	printm(peekMatrix());
+	mat4 nextMat = peekMatrix()*staticScales[n]*sinusoidTrans;
+	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
+
 	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); // = Num triangles * 3
+
+	// Handy place to draw extents
+	if (extentMode){
+		mat4 extentMat = nextMat*RotateY(-meshYRotate);
+		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, extentMat);
+		MyPoint points[14];
+		MyPoint max = pics[n].max;
+		MyPoint min = pics[n].min;
+
+		points[0 ] = min;
+		points[1 ] = MyPoint(  min.x,  max.y,  min.z, 1.0f); 
+		points[2 ] = MyPoint(  max.x,  max.y,  min.z, 1.0f); 
+		points[3 ] = MyPoint(  max.x,  min.y,  min.z, 1.0f); 
+		points[4 ] = MyPoint(  max.x,  min.y,  max.z, 1.0f); 
+		points[5 ] = max;
+		points[6 ] = MyPoint(  min.x,  max.y,  max.z, 1.0f); 
+		points[7 ] = MyPoint(  min.x,  min.y,  max.z, 1.0f); 
+		points[8 ] = min; 
+		points[9 ] = MyPoint(  max.x,  min.y,  min.z, 1.0f); 
+		points[10] = MyPoint(  max.x,  max.y,  min.z, 1.0f); 
+		points[11] = max;
+		points[12] = MyPoint(  max.x,  max.y,  max.z, 1.0f); 
+		points[13] = MyPoint(  min.x,  max.y,  min.z, 1.0f); 
+
+		// Prepare buffer
+		glBufferData( GL_ARRAY_BUFFER, sizeof(points) ,  points, GL_STATIC_DRAW );
+	
+		// Have to do this every time...
+		GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+		glEnableVertexAttribArray( vPosition );
+		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+
+		glDrawArrays( GL_LINE_LOOP, 0, 14 ); // = Num triangles * 3
+	}
 }
 
 
@@ -127,7 +175,7 @@ mat4 MyLookAt(void )
 void display3( void )
 {
 	// set up projection matricies
-	GLuint ctmMatrix = glGetUniformLocationARB(program, "CTM");
+	
 	glEnable( GL_DEPTH_TEST );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -144,15 +192,9 @@ void display3( void )
 	// of floating point precision
 
 
-
-
-	
-
 	/**********************************************************************
 	MATRIX STACK HERE Fun part of pushing and popping as we go through matrix stack
 	***********************************************************************/
-	mat4 nextMat;
-	mat4 yRot = RotateY(meshYRotate);
 	resetMatrixStack();
 	// Might as well put camera on the stack	
 	// Prepratory transformation matrics
@@ -162,56 +204,32 @@ void display3( void )
 	
 	
 	
-	// LAYER 0
-	whichPic = 0;
-	for (whichPic = 0; whichPic < 9; whichPic++){
-		pushMatrix( peekMatrix()*staticTransforms[whichPic]*yRot);
-		printm(peekMatrix());
-		nextMat = peekMatrix()*staticScales[whichPic]*CTM;
-		// CTM will be fore moving individual parts?!?!
-		glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat); 
-		drawAPic(whichPic );
-	}
 
-
-
-//	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, cam_ctm*staticTransforms[whichPic+1]*staticTransforms[whichPic]*staticScales[whichPic+1]*CTM);
-//	drawAPic(whichPic + 1);
-
-
-
+		
+	drawAPic(0 );// layer 1
+	drawAPic(1 );// layer 2
+	drawAPic(2 );// layer 3
+	popMatrix();
+	drawAPic(3 );// other half of layer 4
+	drawAPic(4 );// layer 4
+	drawAPic(5 );// layer 5
+	popMatrix();
+	drawAPic(6 );// other half of layer 5
+	popMatrix();
+	popMatrix();
+	drawAPic(7 );// other half of layer 4
+	popMatrix();
+	popMatrix();
+	popMatrix();
+	drawAPic(8); // other half of layer 5
+	
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
 }
 
 
 
-// Set the nextTransformation to be the identity matrix
-void stopCTM(void){
-	nextTransform = Angel::identity();
-}
 
-// Initializes the current transformation matrix and others
-void initCTM(void){
-	CTM = Angel::identity();
-	stopCTM();
-
-}
-
-// If a key is repeated, the motion is stopped. Else, set motion
-// Mat = a motion because it will be the "nextTransformation"
-// cmd is the command key
-char lastCommand = 'q';
-char showRoom = GL_FALSE;
-void toggleTransform(mat4 mat, char cmd){
-	if (cmd == lastCommand){
-		stopCTM();
-		lastCommand = 'q'; //default
-	} else {
-		nextTransform = mat;
-		lastCommand = cmd;
-	}
-}
 
 // A macro for compressing a case statement
 #define COMMAND_CASE(mat,key) case key: toggleTransform(mat,key); break;
@@ -221,7 +239,7 @@ void toggleTransform(mat4 mat, char cmd){
 void keyboard3( unsigned char key, int x, int y )
 {
 	// Always turn this off when a key is pressed
-	showRoom = GL_FALSE;
+	
 	nextTransform = Angel::identity();
     switch ( key ) {
 	// Commands that I made up
@@ -236,25 +254,15 @@ void keyboard3( unsigned char key, int x, int y )
 		printf("Not Implemented! \n");
 		break;
 
-
-
-	// My BETTER rotational commands
-	COMMAND_CASE( RotateX( ROTATION_INCREMENT),'D');
-	COMMAND_CASE( RotateX(-ROTATION_INCREMENT),'d');
-	COMMAND_CASE( RotateY( ROTATION_INCREMENT),'E');
-	COMMAND_CASE( RotateY(-ROTATION_INCREMENT),'e');
-	COMMAND_CASE( RotateZ( ROTATION_INCREMENT),'F');
-	COMMAND_CASE( RotateZ(-ROTATION_INCREMENT),'f');
-
+	case 's':
+	case 'S':
+		sinusoidMode = ~sinusoidMode;
+		break;
 	
-	// Translational commands
-	// ALL translational commands STOP the previous translation
-	COMMAND_CASE( Translate(  TRANSLATION_INCREMENT,0.0,0.0),'X');// Translate in positive X
-	COMMAND_CASE( Translate( -TRANSLATION_INCREMENT,0.0,0.0),'x');// Translate in negative X		
-	COMMAND_CASE( Translate( 0.0, TRANSLATION_INCREMENT,0.0),'Y'); // Translate in positive Y
-	COMMAND_CASE( Translate( 0.0,-TRANSLATION_INCREMENT,0.0),'y');// Translate in negative Y
-	COMMAND_CASE( Translate( 0.0,0.0, TRANSLATION_INCREMENT),'Z'); // Translate in positive Z
-	COMMAND_CASE( Translate( 0.0,0.0,-TRANSLATION_INCREMENT),'z');// Translate in negative Z
+	case 'e':
+	case 'E':
+		extentMode = ~extentMode;
+		break;
 	
 	// Slider camera
 	case 'N': delN += SLIDE_INC; break;
@@ -286,19 +294,20 @@ void keyboard3( unsigned char key, int x, int y )
     }
 
 	
-	CTM = nextTransform*CTM;
 
-	display3();
 }
 
 
 // Multiply the current transform matrix by the next transform to do fun stuff!
 void idleTransformations3(void){
-	meshYRotate += 0.05f;
+	meshYRotate += MESH_Y_ROT_INC;
 	
-	CTM = CTM*nextTransform;
-	glutPostRedisplay(); //?
+	if (sinusoidMode){
+		sinusoidModeAngle += SINUSOID_INC;
+	}
 
+
+	glutPostRedisplay(); //?
 }
 
 
@@ -314,43 +323,51 @@ void initPLYPictures(void){
 		staticScales[i] =  scaleToFitWindow*Scale(.2); // Maybe have them bigger?
 	}
 
-	mat4 downLeft  = Translate(.4,-.3,0);
-	mat4 downRight = Translate(-.4,-.3,0);
 	
+
 	// Top layer
 	staticTransforms[0] = Translate(0,0.8,0); // moved to top
 
 	// 2nd layer - all have parent of 0
-	staticTransforms[1] =   downLeft;
-	staticTransforms[8] =  downRight;
+	float rotationRadius = .75;
+	staticTransforms[1] =    Translate(rotationRadius*.5,-.3,0);
+	staticScales[1] *= Scale(.75); // foot
+	staticTransforms[8] =    Translate(-rotationRadius*.5,-.3,0);
+	staticScales[8] *= Scale(1.5); // stratocaster
 
 	// 3rd layer parent = 1
-	staticTransforms[2] = downLeft; 
-	staticTransforms[3] = downRight;
+	rotationRadius *= .5;
+	staticTransforms[2] = Translate(rotationRadius,-.3,0); 
+	staticScales[2] *= Scale(.65); // tennishoe
+	
+	staticTransforms[3] = Translate(-rotationRadius, -.3,0);
+	staticScales[3] *= Scale(.5); // ant
 
 	// 4th layer - parent = 3
-	staticTransforms[7] = downLeft;
-	staticTransforms[4] = downRight;
-
+	rotationRadius *= .5;
+	staticTransforms[7] = Translate(rotationRadius,-.3,0);
+	staticScales[7] *= Scale(.5); // urn
+	staticTransforms[4] = Translate(-rotationRadius,-.3,0);
+	staticScales[4] *= Scale(.55); // beethoven
+	
 	// 5th layer - parent = 4
-	staticTransforms[5] = downLeft; 
-	staticTransforms[6] = downRight;
+	rotationRadius *= .5;
+	staticTransforms[5] = Translate(rotationRadius,-.3,0);
+	staticScales[5] *= Scale(.4); // sandal
+	staticTransforms[6] = Translate(-rotationRadius,-.3,0);
 }
-
-
 
 
 //----------------------------------------------------------------------------
 int HW3( int argc, char **argv )
 {
 	genericInit(argc, argv, "Homework 3: Robert Dabrowski");
-	initCTM();
 
     shaderSetupTwo();
 	initPLYPictures();
 	initMatrixStack(10); // extra big
 
-
+	ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	//// assign handlers
     glutDisplayFunc( display3 );
     glutKeyboardFunc( keyboard3 );
