@@ -204,9 +204,9 @@ void display3( void )
 	resetMatrixStack();
 	// Might as well put camera on the stack	
 	// Prepratory transformation matrics
-	mat4 cam_ctm = Translate(delU, delV, delN)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch); // Alternate method that is meh 
-//	pushMatrix(cam_ctm); // i dont like this camera as much 
-	pushMatrix(MyLookAt( ));
+	mat4 cam_ctm = Translate(0,0,1)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch)*Translate(0, 0, -1)*Translate(delU, delV, delN); // Alternate method that is meh 
+	pushMatrix(cam_ctm); // i dont like this camera as much 
+	//pushMatrix(MyLookAt( ));
 	
 
 	// Draw each mesh using the matrix stack	
