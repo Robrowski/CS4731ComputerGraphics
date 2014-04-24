@@ -38,10 +38,129 @@ GLuint ctmMatrix;
 #define MESH_Y_ROT_INC 0.5f
 #define SINUSOID_INC   0.1f
 #define SINUSOID_AMP   0.25f
-#define ROTATION_INCREMENT    2 // degrees
+#define ROTATION_INCREMENT    2.0 // degrees
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
 
+
+// Pitch, rotate on u
+	// roll, rotate on n
+	// yaw, rotate on v
+	// slide on u or v or n
+mat4 MyLookAt(void )
+{
+	// Starting points and vector
+	vec4 at =  vec4(0,0,0 ,1);
+	vec4 eye = vec4(0,0,.3 ,1);	  
+	vec4 up = vec4(0,1,0,0);
+
+	// Math stolen from Angel::LookAt
+	vec4 n1 = eye - at;
+	n1.w = 0;
+    vec4 n = normalize(n1);
+    vec4 u = normalize(vec4(cross(up,n), 0));
+    vec4 v = normalize(vec4(cross(n,u), 0));
+    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+
+	// Handle roll
+	GLfloat r = -roll*DEG_TO_RAD;
+	vec4 rot_n = n;
+	vec4 rot_u = u*cos(r) - v*sin(r);
+	vec4 rot_v = u*sin(r) + v*cos(r);
+	n = rot_n;
+	u = rot_u;
+	v = rot_v;
+
+	// pitch
+	GLfloat p = -pitch*DEG_TO_RAD;
+	rot_n =  n*cos(p) - v*sin(p);
+	rot_v = n*sin(p) + v*cos(p);
+	n = rot_n;
+	u = rot_u;
+	v = rot_v;
+
+	// yaw
+	GLfloat y = -yaw*DEG_TO_RAD;
+	rot_n = n*cos(y) + u*sin(y);
+	rot_u = -n*sin(y) + u*cos(y);
+	n = rot_n;
+	u = rot_u;
+	v = rot_v;
+
+	// Handle sliding
+	GLfloat ex = eye.x + delU*u.x + delV*v.x + delN*n.x;
+	GLfloat ey = eye.y + delU*u.y + delV*v.y + delN*n.y;
+	GLfloat ez = eye.z + delU*u.z + delV*v.z + delN*n.z;
+	vec4 eyeSlide = vec4( ex, ey,ez,1);
+
+    mat4 c = mat4(u, v, n, t);
+    return c * Translate( -eyeSlide );
+}
+
+
+
+
+// Attempt at Camera #2
+MyPoint eye = MyPoint(0,0,.3,1);
+vec3 u,v,n;
+mat4 NewCamera;
+
+
+
+void MySetModelViewMatrix(void)
+{ // load modelview matrix with camera values
+	/*
+	mat4 m;
+	vec3 eVec(eye.x, eye.y, 	eye.z);// eye as vector
+	m[0] = u.x; m[4] = u.y; m[8] = 	u.z; m[12] = -dot(eVec,u);
+	m[1] = v.x; m[5] = v.y; m[9] = 	v.z; m[13] = -dot(eVec,v);
+	m[2] = n.x; m[6] = n.y; m[10] = n.z; m[14] = -dot(eVec,n);
+	m[3] =   0; m[7] =   0; m[11] =   0; m[15] = 1.0;
+	NewCamera = m;
+	*/
+	
+	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+    mat4 c = mat4(u, v, n, t);
+    NewCamera =  c * Translate( -eye );
+	printm(NewCamera);
+	
+}
+
+void MySlide(float dU, float dV, float dN)
+{
+	eye.x += dU*u.x + dV*v.x + dN*n.x;
+	eye.y += dU*u.y + dV*v.y + dN*n.y;
+	eye.z += dU*u.z + dV*v.z + dN*n.z;
+	MySetModelViewMatrix( );
+}
+
+void MyRoll(float angle)
+{ // roll the camera through angle degrees
+	float cs = cos(DEG_TO_RAD * angle);
+	float sn = sin(DEG_TO_RAD * angle);
+	vec3 t = u; // remember old u
+	u = vec3(cs*t.x + sn*v.x, cs*t.y + sn*v.y, cs*t.z + sn*v.z);
+	v = vec3(-sn*t.x + cs*v.x, -sn*t.y + cs*v.y, -sn*t.z + cs*v.z) ;
+	MySetModelViewMatrix( );
+} 
+
+
+void initCamera(void){
+	/*
+	vec4 at =  vec4(0,0,0 ,1);
+	vec4 eye = vec4(0,0,.3 ,1);	  
+	vec4 up = vec4(0,1,0,0);
+	printm( LookAt(eye,at,up));
+	*/
+
+	u = vec3(1,0,0);
+	v = vec3(0,1,0);
+	n = vec3(0,0,1);
+	eye = MyPoint(1,1,.3,1);
+
+	MySetModelViewMatrix();
+	printm(NewCamera);
+}
 
 // Helper to draw a pic by number - handles relative transformations
 // Pushes current transformation and assumes previous + camera are on stack
@@ -119,59 +238,6 @@ void drawAPic(GLint n){
 
 
 
-// Pitch, rotate on u
-	// roll, rotate on n
-	// yaw, rotate on v
-	// slide on u or v or n
-mat4 MyLookAt(void )
-{
-	// Starting points and vector
-	vec4 at =  vec4(0,0,0 ,1);
-	vec4 eye = vec4(0,0,.3 ,1);	  
-	vec4 up = vec4(0,1,0,0);
-
-	// Math stolen from Angel::LookAt
-	vec4 n1 = eye - at;
-	n1.w = 0;
-    vec4 n = normalize(n1);
-    vec4 u = normalize(vec4(cross(up,n), 0));
-    vec4 v = normalize(vec4(cross(n,u), 0));
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-
-	// Handle roll
-	GLfloat r = -roll*DEG_TO_RAD;
-	vec4 rot_n = n;
-	vec4 rot_u = u*cos(r) - v*sin(r);
-	vec4 rot_v = u*sin(r) + v*cos(r);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// pitch
-	GLfloat p = -pitch*DEG_TO_RAD;
-	rot_n =  n*cos(p) - v*sin(p);
-	rot_v = n*sin(p) + v*cos(p);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// yaw
-	GLfloat y = -yaw*DEG_TO_RAD;
-	rot_n = n*cos(y) + u*sin(y);
-	rot_u = -n*sin(y) + u*cos(y);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// Handle sliding
-	GLfloat ex = eye.x + delU*u.x + delV*v.x + delN*n.x;
-	GLfloat ey = eye.y + delU*u.y + delV*v.y + delN*n.y;
-	GLfloat ez = eye.z + delU*u.z + delV*v.z + delN*n.z;
-	vec4 eyeSlide = vec4( ex, ey,ez,1);
-
-    mat4 c = mat4(u, v, n, t);
-    return c * Translate( -eyeSlide );
-}
 
 
 
@@ -204,10 +270,10 @@ void display3( void )
 	resetMatrixStack();
 	// Might as well put camera on the stack	
 	// Prepratory transformation matrics
-	mat4 cam_ctm = Translate(0,0,1)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch)*Translate(0, 0, -1)*Translate(delU, delV, delN); // Alternate method that is meh 
-	pushMatrix(cam_ctm); // i dont like this camera as much 
+//	mat4 cam_ctm = Translate(0,0,1)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch)*Translate(0, 0, -1)*Translate(delU, delV, delN); // Alternate method that is meh 
+//	pushMatrix(cam_ctm); // i dont like this camera as much 
 	//pushMatrix(MyLookAt( ));
-	
+	pushMatrix(NewCamera);
 
 	// Draw each mesh using the matrix stack	
 	drawAPic(0 );// layer 1
@@ -254,18 +320,18 @@ void keyboard3( unsigned char key, int x, int y )
 		break;
 	
 	// Slider camera
-	case 'N': delN += SLIDE_INC*5; break;
-	case 'n': delN -= SLIDE_INC*5; printf("delN: %f\n",delN); break;
-	case 'V': delV += SLIDE_INC; break;
-	case 'v': delV -= SLIDE_INC; break;
-	case 'U': delU += SLIDE_INC; break;
-	case 'u': delU -= SLIDE_INC; break;
+	case 'N': delN += SLIDE_INC*5; MySlide( 0, 0, -.1 ); break;
+	case 'n': delN -= SLIDE_INC*5; MySlide( 0, 0,  .1 ); break;
+	case 'V': delV += SLIDE_INC; MySlide( 0,-.1,0 ); break;
+	case 'v': delV -= SLIDE_INC; MySlide( 0,.1, 0 ); break;
+	case 'U': delU += SLIDE_INC; MySlide(-.1,0 ,0 );break;
+	case 'u': delU -= SLIDE_INC; MySlide( .1,0 ,0 );break;
 	
 	// Camera Rotations
 	case 'j': yaw -= CAM_ROT_INC; break;
 	case 'J': yaw += CAM_ROT_INC; break;
-	case 'k': roll -= CAM_ROT_INC; break;
-	case 'K': roll += CAM_ROT_INC; break;
+	case 'k': roll -= CAM_ROT_INC; MyRoll( ROTATION_INCREMENT); break;
+	case 'K': roll += CAM_ROT_INC; MyRoll(-ROTATION_INCREMENT);break;
 	case 'l': pitch -= CAM_ROT_INC; break;
 	case 'L': pitch += CAM_ROT_INC; break;
 
@@ -273,6 +339,7 @@ void keyboard3( unsigned char key, int x, int y )
 	case 'r':
 		yaw = 0; roll = 0; pitch = 0;
 		delN = 0; delU = 0; delV = 0;
+		initCamera();
 		break;
 
 	// Quit commands
@@ -369,6 +436,10 @@ int HW3( int argc, char **argv )
 	initMatrixStack(20); // extra big
 	ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	
+	// Starting points and vector
+	initCamera();
+	
+
     glutDisplayFunc( display3 );
     glutKeyboardFunc( keyboard3 );
 	glutIdleFunc(idleTransformations3);
