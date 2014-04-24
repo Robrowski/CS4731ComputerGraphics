@@ -109,21 +109,21 @@ mat4 NewCamera;
 
 void MySetModelViewMatrix(void)
 { // load modelview matrix with camera values
-	/*
+	
 	mat4 m;
 	vec3 eVec(eye.x, eye.y, 	eye.z);// eye as vector
-	m[0] = u.x; m[4] = u.y; m[8] = 	u.z; m[12] = -dot(eVec,u);
-	m[1] = v.x; m[5] = v.y; m[9] = 	v.z; m[13] = -dot(eVec,v);
-	m[2] = n.x; m[6] = n.y; m[10] = n.z; m[14] = -dot(eVec,n);
-	m[3] =   0; m[7] =   0; m[11] =   0; m[15] = 1.0;
+	m[0][0] = u.x; m[0][1] = u.y; m[0][2] = 	u.z; m[0][3] = -dot(eVec,u);
+	m[1][0] = v.x; m[1][1] = v.y; m[1][2] = 	v.z; m[1][3] = -dot(eVec,v);
+	m[2][0] = n.x; m[2][1] = n.y; m[2][2] = n.z; m[2][3] = -dot(eVec,n);
+	m[3][0] = 0;   m[3][1] =   0; m[3][2] =   0; m[3][3] = 1.0;
 	NewCamera = m;
-	*/
 	
+	/*
 	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
     mat4 c = mat4(u, v, n, t);
     NewCamera =  c * Translate( -eye );
 	printm(NewCamera);
-	
+	*/
 }
 
 void MySlide(float dU, float dV, float dN)
@@ -134,16 +134,42 @@ void MySlide(float dU, float dV, float dN)
 	MySetModelViewMatrix( );
 }
 
+
+// roll, rotate on n
 void MyRoll(float angle)
 { // roll the camera through angle degrees
 	float cs = cos(DEG_TO_RAD * angle);
 	float sn = sin(DEG_TO_RAD * angle);
-	vec3 t = u; // remember old u
-	u = vec3(cs*t.x + sn*v.x, cs*t.y + sn*v.y, cs*t.z + sn*v.z);
-	v = vec3(-sn*t.x + cs*v.x, -sn*t.y + cs*v.y, -sn*t.z + cs*v.z) ;
+	vec3 X = u; // remember old u
+	vec3 Y = v;
+	u = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
+	v = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
 	MySetModelViewMatrix( );
 } 
 
+// yaw, rotate on v
+void MyYaw(float angle)
+{ // roll the camera through angle degrees
+	float cs = cos(DEG_TO_RAD * angle);
+	float sn = sin(DEG_TO_RAD * angle);
+	vec3 X = u; // remember old u
+	vec3 Y = n;
+	u = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
+	n = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
+	MySetModelViewMatrix( );
+} 
+
+// Pitch, rotate on u
+void MyPitch(float angle)
+{ // roll the camera through angle degrees
+	float cs = cos(DEG_TO_RAD * angle);
+	float sn = sin(DEG_TO_RAD * angle);
+	vec3 X = n; // remember old u
+	vec3 Y = v;
+	n = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
+	v = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
+	MySetModelViewMatrix( );
+} 
 
 void initCamera(void){
 	/*
@@ -156,7 +182,7 @@ void initCamera(void){
 	u = vec3(1,0,0);
 	v = vec3(0,1,0);
 	n = vec3(0,0,1);
-	eye = MyPoint(1,1,.3,1);
+	eye = MyPoint(0,-.7,.3,1);
 
 	MySetModelViewMatrix();
 	printm(NewCamera);
@@ -172,6 +198,8 @@ void drawAPic(GLint n){
 	// stuff in nextMat doesn't get pushed.. but could
 	mat4 nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans;
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
+
+	
 
 	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
@@ -277,7 +305,7 @@ void display3( void )
 
 	// Draw each mesh using the matrix stack	
 	drawAPic(0 );// layer 1
-	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
+/*	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
 		drawAPic(8 );// layer 2
 		popMatrix();
 		drawAPic(1); // other half of layer 2
@@ -293,7 +321,7 @@ void display3( void )
 					drawAPic(5 );// layer 5
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
-	
+	*/
 
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
@@ -328,12 +356,12 @@ void keyboard3( unsigned char key, int x, int y )
 	case 'u': delU -= SLIDE_INC; MySlide( .1,0 ,0 );break;
 	
 	// Camera Rotations
-	case 'j': yaw -= CAM_ROT_INC; break;
-	case 'J': yaw += CAM_ROT_INC; break;
+	case 'j': yaw -= CAM_ROT_INC; MyYaw(ROTATION_INCREMENT);  break;
+	case 'J': yaw += CAM_ROT_INC; MyYaw(-ROTATION_INCREMENT);  break;
 	case 'k': roll -= CAM_ROT_INC; MyRoll( ROTATION_INCREMENT); break;
 	case 'K': roll += CAM_ROT_INC; MyRoll(-ROTATION_INCREMENT);break;
-	case 'l': pitch -= CAM_ROT_INC; break;
-	case 'L': pitch += CAM_ROT_INC; break;
+	case 'l': pitch -= CAM_ROT_INC; MyPitch(ROTATION_INCREMENT); break;
+	case 'L': pitch += CAM_ROT_INC; MyPitch(-ROTATION_INCREMENT); break;
 
 	// Reset camera
 	case 'r':
@@ -384,7 +412,7 @@ void initPLYPictures(void){
 	}
 
 	// Top layer
-	staticTransforms[0] = Translate(0,0.8,0); // moved to top
+	staticTransforms[0] = Translate(0,0,0); // moved to top
 	links[0] = 0;
 
 	// 2nd layer - all have parent of 0
