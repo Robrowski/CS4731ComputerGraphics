@@ -105,11 +105,8 @@ MyPoint eye = MyPoint(0,0,.3,1);
 vec3 u,v,n;
 mat4 NewCamera;
 
-
-
 void MySetModelViewMatrix(void)
 { // load modelview matrix with camera values
-	
 	mat4 m;
 	vec3 eVec(eye.x, eye.y, 	eye.z);// eye as vector
 	m[0][0] = u.x; m[0][1] = u.y; m[0][2] = 	u.z; m[0][3] = -dot(eVec,u);
@@ -117,13 +114,7 @@ void MySetModelViewMatrix(void)
 	m[2][0] = n.x; m[2][1] = n.y; m[2][2] = n.z; m[2][3] = -dot(eVec,n);
 	m[3][0] = 0;   m[3][1] =   0; m[3][2] =   0; m[3][3] = 1.0;
 	NewCamera = m;
-	
-	/*
-	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-    mat4 c = mat4(u, v, n, t);
-    NewCamera =  c * Translate( -eye );
 	printm(NewCamera);
-	*/
 }
 
 void MySlide(float dU, float dV, float dN)
@@ -152,10 +143,10 @@ void MyYaw(float angle)
 { // roll the camera through angle degrees
 	float cs = cos(DEG_TO_RAD * angle);
 	float sn = sin(DEG_TO_RAD * angle);
-	vec3 X = u; // remember old u
-	vec3 Y = n;
-	u = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
-	n = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
+	vec3 X = n; 
+	vec3 Y = u;
+	n = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
+	u = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
 	MySetModelViewMatrix( );
 } 
 
@@ -164,28 +155,21 @@ void MyPitch(float angle)
 { // roll the camera through angle degrees
 	float cs = cos(DEG_TO_RAD * angle);
 	float sn = sin(DEG_TO_RAD * angle);
-	vec3 X = n; // remember old u
-	vec3 Y = v;
-	n = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
-	v = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
+	vec3 X = v; 
+	vec3 Y = n;
+	v = vec3(cs*X.x + sn*Y.x, cs*X.y + sn*Y.y, cs*X.z + sn*Y.z);
+	n = vec3(-sn*X.x + cs*Y.x, -sn*X.y + cs*Y.y, -sn*X.z + cs*Y.z) ;
 	MySetModelViewMatrix( );
 } 
 
 void initCamera(void){
-	/*
-	vec4 at =  vec4(0,0,0 ,1);
-	vec4 eye = vec4(0,0,.3 ,1);	  
-	vec4 up = vec4(0,1,0,0);
-	printm( LookAt(eye,at,up));
-	*/
-
 	u = vec3(1,0,0);
 	v = vec3(0,1,0);
 	n = vec3(0,0,1);
-	eye = MyPoint(0,-.7,.3,1);
+	eye = MyPoint(0,-.7,3.3,1);
 
 	MySetModelViewMatrix();
-	printm(NewCamera);
+	
 }
 
 // Helper to draw a pic by number - handles relative transformations
@@ -198,8 +182,6 @@ void drawAPic(GLint n){
 	// stuff in nextMat doesn't get pushed.. but could
 	mat4 nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans;
 	glUniformMatrix4fv( ctmMatrix, 1, GL_TRUE, nextMat);
-
-	
 
 	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
@@ -265,32 +247,15 @@ void drawAPic(GLint n){
 }
 
 
-
-
-
-
 //----------------------------------------------------------------------------
 // this is where the drawing should happen
 // ASSUME GPU BUFFERS ARE ALREADY LOADED
 void display3( void )
 {
 	// set up projection matricies
-	
 	glEnable( GL_DEPTH_TEST );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-	// PROTIP4: Do not set the near and far plane too far appart!
-	// depth buffers do not have unlimited resolution
-	// surfaces will start to fight as they come nearer to each other
-	// if the planes are too far appart (quantization errors :(   )
-
-	// PROTIP5: If you must have extreme distances, use multiple render passes
-	// which divide the entire scene into adjacent viewing volumes
-	// render far away volumes first
-	// also scale your objects appropriatly, dont use scales at the upper or lower bounds
-	// of floating point precision
-
 
 	/**********************************************************************
 	MATRIX STACK HERE Fun part of pushing and popping as we go through matrix stack
@@ -301,11 +266,15 @@ void display3( void )
 //	mat4 cam_ctm = Translate(0,0,1)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch)*Translate(0, 0, -1)*Translate(delU, delV, delN); // Alternate method that is meh 
 //	pushMatrix(cam_ctm); // i dont like this camera as much 
 	//pushMatrix(MyLookAt( ));
-	pushMatrix(NewCamera);
+ 
+	// TODO: put projection matrix left of camera
+	int box = 1.5;
+	//pushMatrix(Angel::Frustum( -box, box, -box,box,  0.01,  10 )*Translate(0,0, 0.8)*NewCamera  );
+	pushMatrix(Perspective(45.0, 1, 0.01, 10)*Translate(0,0, 0.8)*NewCamera  );
 
 	// Draw each mesh using the matrix stack	
 	drawAPic(0 );// layer 1
-/*	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
+	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
 		drawAPic(8 );// layer 2
 		popMatrix();
 		drawAPic(1); // other half of layer 2
@@ -321,8 +290,7 @@ void display3( void )
 					drawAPic(5 );// layer 5
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
-	*/
-
+	
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
 }

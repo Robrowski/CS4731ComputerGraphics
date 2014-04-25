@@ -81,8 +81,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bmpread.c" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="draw.cpp" />
+    <ClCompile Include="example1.cpp" />
     <ClCompile Include="GRS.cpp" />
     <ClCompile Include="hw1.cpp" />
     <ClCompile Include="frame.cpp" />
@@ -103,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Angel.h" />
+    <ClInclude Include="bmpread.h" />
     <ClInclude Include="CheckError.h" />
     <ClInclude Include="homework.h" />
     <ClInclude Include="mat.h" />
@@ -163,6 +166,16 @@
     <None Include="ply_files\urn2.ply" />
     <None Include="ply_files\walkman.ply" />
     <None Include="ply_files\weathervane.ply" />
+    <None Include="test24.bmp" />
+    <None Include="textures\grass.bmp" />
+    <None Include="textures\nvnegx.bmp" />
+    <None Include="textures\nvnegy.bmp" />
+    <None Include="textures\nvnegz.bmp" />
+    <None Include="textures\nvposx.bmp" />
+    <None Include="textures\nvposy.bmp" />
+    <None Include="textures\nvposz.bmp" />
+    <None Include="textures\stones.bmp" />
+    <None Include="usain_bolt.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
