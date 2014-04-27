@@ -47,9 +47,9 @@ int n = N;
 int m = M;
 
 
-bmpread_t bitmap;
+static  GLuint  texture2 = 0;
 
-static  GLuint  texture = 0;
+bmpread_t bitmap2;
 //----------------------------------------------------------------------------
 
 void
@@ -57,23 +57,23 @@ init( void )
 {
 	printf("Loading usain_bolt.bmp\n");
 
-	if(!bmpread("usain_bolt.bmp", 0, &bitmap))
+	if(!bmpread("usain_bolt.bmp", 0, &bitmap2))
 	{
 		fprintf(stderr, "%s:error loading bitmap file\n", "usain_bolt.bmp");
 		exit(1);
 	}
 
     glActiveTexture( GL_TEXTURE0 );
-    glGenTextures( 1, &texture );
-    glBindTexture( GL_TEXTURE_2D, texture );
+    glGenTextures( 1, &texture2 );
+    glBindTexture( GL_TEXTURE_2D, texture2 );
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, bitmap.width, bitmap.height, 0, GL_RGB, GL_UNSIGNED_BYTE, bitmap.rgb_data );
-	bmpread_free(&bitmap);
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, bitmap2.width, bitmap2.height, 0, GL_RGB, GL_UNSIGNED_BYTE, bitmap2.rgb_data );
+	bmpread_free(&bitmap2);
 
 
     // Create a vertex array object
@@ -116,9 +116,19 @@ init( void )
 	 
     Projection = glGetUniformLocation( program, "Projection" );
 
+
+
+
+
     // Set our texture samples to the active texture unit
     glUniform1i( glGetUniformLocation(program, "texture"), 0 );
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+
+
+
+
+
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 }

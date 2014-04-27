@@ -7,12 +7,7 @@
 using namespace std;
 //----------------------------------------------------------------------------
 // Camera Position variables
-GLfloat delU = 0;
-GLfloat delV = 0;
-GLfloat delN = 0;
-GLfloat pitch = 0;
-GLfloat roll = 0;
-GLfloat yaw = 0;
+
 
 // The degrees each mesh should have turned
 GLfloat meshYRotate = 0;
@@ -42,60 +37,6 @@ GLuint ctmMatrix;
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
 
-
-// Pitch, rotate on u
-	// roll, rotate on n
-	// yaw, rotate on v
-	// slide on u or v or n
-mat4 MyLookAt(void )
-{
-	// Starting points and vector
-	vec4 at =  vec4(0,0,0 ,1);
-	vec4 eye = vec4(0,0,.3 ,1);	  
-	vec4 up = vec4(0,1,0,0);
-
-	// Math stolen from Angel::LookAt
-	vec4 n1 = eye - at;
-	n1.w = 0;
-    vec4 n = normalize(n1);
-    vec4 u = normalize(vec4(cross(up,n), 0));
-    vec4 v = normalize(vec4(cross(n,u), 0));
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-
-	// Handle roll
-	GLfloat r = -roll*DEG_TO_RAD;
-	vec4 rot_n = n;
-	vec4 rot_u = u*cos(r) - v*sin(r);
-	vec4 rot_v = u*sin(r) + v*cos(r);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// pitch
-	GLfloat p = -pitch*DEG_TO_RAD;
-	rot_n =  n*cos(p) - v*sin(p);
-	rot_v = n*sin(p) + v*cos(p);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// yaw
-	GLfloat y = -yaw*DEG_TO_RAD;
-	rot_n = n*cos(y) + u*sin(y);
-	rot_u = -n*sin(y) + u*cos(y);
-	n = rot_n;
-	u = rot_u;
-	v = rot_v;
-
-	// Handle sliding
-	GLfloat ex = eye.x + delU*u.x + delV*v.x + delN*n.x;
-	GLfloat ey = eye.y + delU*u.y + delV*v.y + delN*n.y;
-	GLfloat ez = eye.z + delU*u.z + delV*v.z + delN*n.z;
-	vec4 eyeSlide = vec4( ex, ey,ez,1);
-
-    mat4 c = mat4(u, v, n, t);
-    return c * Translate( -eyeSlide );
-}
 
 
 
@@ -255,23 +196,23 @@ void display3( void )
 	// set up projection matricies
 	glEnable( GL_DEPTH_TEST );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glPolygonMode( GL_FRONT_AND_BACK, GL_POLYGON_SMOOTH   );
 
 	/**********************************************************************
-	MATRIX STACK HERE Fun part of pushing and popping as we go through matrix stack
+	Camera Setup
 	***********************************************************************/
 	resetMatrixStack();
-	// Might as well put camera on the stack	
-	// Prepratory transformation matrics
-//	mat4 cam_ctm = Translate(0,0,1)*RotateZ(roll)*RotateY(yaw)*RotateX(pitch)*Translate(0, 0, -1)*Translate(delU, delV, delN); // Alternate method that is meh 
-//	pushMatrix(cam_ctm); // i dont like this camera as much 
-	//pushMatrix(MyLookAt( ));
- 
-	// TODO: put projection matrix left of camera
-	int box = 1.5;
-	//pushMatrix(Angel::Frustum( -box, box, -box,box,  0.01,  10 )*Translate(0,0, 0.8)*NewCamera  );
 	pushMatrix(Perspective(45.0, 1, 0.01, 10)*Translate(0,0, 0.8)*NewCamera  );
 
+
+	/**********************************************************************
+	Drawing the GRound Plane
+	***********************************************************************/
+	drawGroundPlane();
+
+	/*****************************************************************
+		DRAWING THE MATRIX STACK
+	******************************************************************/
 	// Draw each mesh using the matrix stack	
 	drawAPic(0 );// layer 1
 	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
@@ -283,6 +224,8 @@ void display3( void )
 			popMatrix();
 			drawAPic(3 );// other half of layer 3
 			pushMatrix( peekMatrix()*RotateY(meshYRotate));
+				/* Fewer objects so that the program runs faster
+				*/
 				drawAPic(7 );// layer 4
 				popMatrix();
 				drawAPic(4 );// other half of layer 4
@@ -290,7 +233,11 @@ void display3( void )
 					drawAPic(5 );// layer 5
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
-	
+				
+
+
+
+
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
 }
@@ -316,26 +263,29 @@ void keyboard3( unsigned char key, int x, int y )
 		break;
 	
 	// Slider camera
-	case 'N': delN += SLIDE_INC*5; MySlide( 0, 0, -.1 ); break;
-	case 'n': delN -= SLIDE_INC*5; MySlide( 0, 0,  .1 ); break;
-	case 'V': delV += SLIDE_INC; MySlide( 0,-.1,0 ); break;
-	case 'v': delV -= SLIDE_INC; MySlide( 0,.1, 0 ); break;
-	case 'U': delU += SLIDE_INC; MySlide(-.1,0 ,0 );break;
-	case 'u': delU -= SLIDE_INC; MySlide( .1,0 ,0 );break;
+	case 'N':  MySlide( 0, 0, -.1 ); break;
+	case 'n':  MySlide( 0, 0,  .1 ); break;
+	case 'V':  MySlide( 0,-.1,0 ); break;
+	case 'v':  MySlide( 0,.1, 0 ); break;
+	case 'U':  MySlide(-.1,0 ,0 );break;
+	case 'u':  MySlide( .1,0 ,0 );break;
 	
 	// Camera Rotations
-	case 'j': yaw -= CAM_ROT_INC; MyYaw(ROTATION_INCREMENT);  break;
-	case 'J': yaw += CAM_ROT_INC; MyYaw(-ROTATION_INCREMENT);  break;
-	case 'k': roll -= CAM_ROT_INC; MyRoll( ROTATION_INCREMENT); break;
-	case 'K': roll += CAM_ROT_INC; MyRoll(-ROTATION_INCREMENT);break;
-	case 'l': pitch -= CAM_ROT_INC; MyPitch(ROTATION_INCREMENT); break;
-	case 'L': pitch += CAM_ROT_INC; MyPitch(-ROTATION_INCREMENT); break;
+	case 'j': MyYaw(ROTATION_INCREMENT);  break;
+	case 'J': MyYaw(-ROTATION_INCREMENT);  break;
+	case 'k': MyRoll( ROTATION_INCREMENT); break;
+	case 'K': MyRoll(-ROTATION_INCREMENT);break;
+	case 'l': MyPitch(ROTATION_INCREMENT); break;
+	case 'L': MyPitch(-ROTATION_INCREMENT); break;
 
 	// Reset camera
 	case 'r':
-		yaw = 0; roll = 0; pitch = 0;
-		delN = 0; delU = 0; delV = 0;
 		initCamera();
+		break;
+
+	case 'B':
+	case 'b':
+		toggleGroundPlane();
 		break;
 
 	// Quit commands
@@ -430,8 +380,19 @@ int HW3( int argc, char **argv )
     shaderSetupTwo();
 	initPLYPictures();
 	initMatrixStack(20); // extra big
+	
+	
+	// Texture Shit
+	setTextureStatus(FALSE);
+	initTexture("textures/stones.bmp");
+	
+	
+	
+	
 	ctmMatrix = glGetUniformLocationARB(program, "CTM");
 	
+
+
 	// Starting points and vector
 	initCamera();
 	

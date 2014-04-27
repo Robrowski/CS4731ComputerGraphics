@@ -1,13 +1,19 @@
 #version 150
 
+// Texture crap
+uniform int useTexture;
+in  vec2 texCoord;
+uniform sampler2D texture;
 
 uniform vec4 fragmentShaderLineColor;
-//in  vec4  interpolatedColor; //deprecated
 out vec4  fColor;
 
 void main() 
 { 
 	fColor = fragmentShaderLineColor;
-    //fColor = interpolatedColor; //deprecated
+
+	if (useTexture == 1){
+		fColor = texture2D( texture, texCoord );
+	}
 } 
 

@@ -95,7 +95,10 @@
       <Filter>Source Files\FileReaders</Filter>
     </ClCompile>
     <ClCompile Include="example1.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Homework</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTexture.cpp">
+      <Filter>Source Files\Abstractions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

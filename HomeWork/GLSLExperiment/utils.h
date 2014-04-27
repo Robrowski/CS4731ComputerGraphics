@@ -139,6 +139,11 @@ void drawPLYPicture(PLYPicture* p);
 void drawPLYPicture3(PLYPicture* p);
 PLYPicture* generatePLYCube(void);
 
+// MyTexture.cpp
+void setTextureStatus(int toSet);
+void initTexture(char* file);
+void drawGroundPlane(void);
+void toggleGroundPlane(void);
 
 // draw.cpp
 void drawFern(int iterations);

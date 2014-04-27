@@ -28,6 +28,8 @@ void pushMatrix(mat4 m){
 		stackTop++;
 		stack[stackTop] = m;
 	}
+	glUniformMatrix4fv( glGetUniformLocationARB(program, "CTM"), 1, GL_TRUE, m);
+
 }
 
 // Because it is stupid to pop then push immediately after

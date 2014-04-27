@@ -98,6 +98,7 @@
     <ClCompile Include="matrixStack.cpp" />
     <ClCompile Include="MyPicture.cpp" />
     <ClCompile Include="MyPolyline.cpp" />
+    <ClCompile Include="MyTexture.cpp" />
     <ClCompile Include="PLYPicture.cpp" />
     <ClCompile Include="PLYreader.cpp" />
     <ClCompile Include="shaderUtils.cpp" />
