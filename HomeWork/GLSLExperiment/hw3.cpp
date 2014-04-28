@@ -23,10 +23,6 @@ mat4 staticTransforms[9]; // static transforms for each layer
 mat4 staticScales[9]; // because scale last
 GLfloat links[9];  // coordinate of top of link
 
-// Location of CTM in vertex shader
-GLuint ctmMatrix;
-
-
 // Tuning Constants
 #define MESH_Y_ROT_INC 0.5f
 #define SINUSOID_INC   0.1f
@@ -34,10 +30,6 @@ GLuint ctmMatrix;
 #define ROTATION_INCREMENT    2.0 // degrees
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
-
-
-
-
 
 
 // Helper to draw a pic by number - handles relative transformations
@@ -314,11 +306,6 @@ int HW3( int argc, char **argv )
 	initTexture("textures/stones.bmp");
 	
 	
-	
-	
-	ctmMatrix = glGetUniformLocationARB(program, "CTM");
-	
-
 
 	// Starting points and vector
 	initCamera();

@@ -19,7 +19,7 @@ PLYPicture* readPLYFile(char* file){
 	READ_LINE; // skip line = ascii version	
 
 	// Header Stuff
-	int numVertices, numTriangles,i;
+	int numVertices, numTriangles,i,t;
 
 
 	char* txt = READ_LINE;
@@ -62,8 +62,7 @@ PLYPicture* readPLYFile(char* file){
 
 	newPLY->max = maxPt;
 	newPLY->min = minPt;
-//	printf("Max: ");	printv(maxPt); printf("\nMin: ");printv(minPt); printf("\n");
-	
+
 	// Triangles
 	for (i = 0; i < numTriangles; i++){
 		unsigned int n, x , y , z;
@@ -72,6 +71,27 @@ PLYPicture* readPLYFile(char* file){
 		//printf("1: %u, 2: %u, 3: %u\n",x,y,z);
 	}
 
+
+
+	MyPoint* V = assembleVertices(newPLY);
+	newPLY->vertices = V;
+	
+	// Calculating Normals 
+	for (i = 0; i < newPLY->numTriangles*3; i+=3 ){
+		float x= 0, y = 0, z = 0;
+		for (t = 0; t < 3; t++){
+			x +=  (V[i+t].y - V[i+((t+1)%3)].y)*(V[i+t].z + V[i+((t+1)%3)].z);
+			y +=  (V[i+t].z - V[i+((t+1)%3)].z)*(V[i+t].x + V[i+((t+1)%3)].x);
+			z +=  (V[i+t].x - V[i+((t+1)%3)].x)*(V[i+t].y + V[i+((t+1)%3)].y);
+		}
+		
+		vec3 normal = vec3(x,y,z);
+		newPLY->normals[i]   = normal;
+		newPLY->normals[i+1] = normal;
+		newPLY->normals[i+2] = normal;
+	}
+
+	
 	return newPLY;
 }
 

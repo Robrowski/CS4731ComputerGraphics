@@ -11,6 +11,8 @@ PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles){
 	ply->points = generateEmptyPolyline(numVertices);
 	ply->numPointsInPicture = numTriangles*3;
 	ply->triangles = (vec3 *) calloc(numTriangles, sizeof(vec3)); // Data is zeroed
+	ply->normals = (vec3 *) calloc(numTriangles*3, sizeof(vec3)); // Normal vectors
+
 	return ply;
 }
 
@@ -107,18 +109,13 @@ void drawPLYPicture(PLYPicture* p){
 }
 
 
-// Draw the given PLY picture
-// IN PROGRESS
-void drawPLYPicture3(PLYPicture* p){
-	// Local variables for ezness
-	int numPoints = p->numTriangles*3;
-	int sizePoints = numPoints*sizeof(MyPoint);
-	int sizeColors = numPoints*sizeof(color4);
-	MyPoint* verts = p->points->pt;
-	vec3* triVerts = p->triangles;
-		
+
+MyPoint* assembleVertices(PLYPicture* p){
 	// Preparing Data
-	MyPoint* points = (MyPoint *) calloc(numPoints, sizeof(MyPoint)); // holds data
+	MyPoint* points = (MyPoint *) calloc(p->numTriangles*3, sizeof(MyPoint)); // holds data
+	vec3* triVerts = p->triangles;
+	MyPoint* verts = p->points->pt;
+
 	int t; int i = 0; 
 	// for each triangle, copy th three points in
 	for (t = 0; t < p->numTriangles; t++, i+=3 ){
@@ -132,7 +129,24 @@ void drawPLYPicture3(PLYPicture* p){
 		points[i + 1] = verts[two];
 		points[i + 2] = verts[three];                 
 	}
-	
+
+	return points;	
+}
+
+
+
+// Draw the given PLY picture
+// IN PROGRESS
+void drawPLYPicture3(PLYPicture* p){
+	// Local variables for ezness
+	int numPoints = p->numTriangles*3;
+	int sizePoints = numPoints*sizeof(MyPoint);
+	int sizeColors = numPoints*sizeof(color4);
+		
+	// Preparing Data
+	MyPoint* points  = p->vertices;
+	vec3*    normals = p->normals;
+
 	// Prepare buffer
     glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
 	
@@ -141,6 +155,8 @@ void drawPLYPicture3(PLYPicture* p){
     glEnableVertexAttribArray( vPosition );
     glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
 
-	// Free allocated data
-	free(points); 
+
 }
+
+
+

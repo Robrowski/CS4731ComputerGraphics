@@ -2,8 +2,6 @@
 #include "utils.h"
 #include "bmpread.h"
 
-
-
 bmpread_t bitmap;
 static  GLuint  texture = 0;
 #define GRASS 1
@@ -11,16 +9,16 @@ static  GLuint  texture = 0;
 GLint groundPlaneState = GRASS;
 
 
-
-GLint inc = 10;
+GLfloat inc = 10;
+GLfloat vertLocation = -1.3;
  
 MyPoint groundPlane[6] = {
-	MyPoint( -inc, -2,  inc , 1.0 ),
-	MyPoint( -inc, -2, -inc, 1.0 ),
-	MyPoint( inc, -2, -inc, 1.0 ),
-	MyPoint( inc, -2, -inc,  1.0 ),
-	MyPoint( inc, -2,  inc, 1.0 ),
-	MyPoint( -inc, -2, inc, 1.0 )
+	MyPoint( -inc, vertLocation,  inc, 1.0 ),
+	MyPoint( -inc, vertLocation, -inc, 1.0 ),
+	MyPoint(  inc, vertLocation, -inc, 1.0 ),
+	MyPoint(  inc, vertLocation, -inc, 1.0 ),
+	MyPoint(  inc, vertLocation,  inc, 1.0 ),
+	MyPoint( -inc, vertLocation,  inc, 1.0 )
     };
 
 // Sends teh given color vector to the fragment shader for colorizing
@@ -36,14 +34,11 @@ void toggleGroundPlane(void){
 		initTexture("textures/grass.bmp");
 		groundPlaneState = GRASS;
 	}
-
-
 }
 
 // Assumes ONLY camera is in CTM
 void drawGroundPlane(void){
 	setTextureStatus(TRUE);
-
 
     glBufferData( GL_ARRAY_BUFFER, sizeof(groundPlane), groundPlane, GL_STATIC_DRAW );
 
@@ -61,8 +56,6 @@ void drawGroundPlane(void){
 
 
 void initTexture(char* file){
-	
-	
 	printf("Loading the %s texture\n", file);
 
 	if(!bmpread(file, 0, &bitmap))
@@ -70,7 +63,6 @@ void initTexture(char* file){
 		fprintf(stderr, "%s:error loading bitmap file\n", file);
 		exit(1);
 	}
-
 
 	// I think this stuff loads and activates the texture
 	glActiveTexture( GL_TEXTURE0 );
@@ -89,7 +81,6 @@ void initTexture(char* file){
 	// Set our texture samples to the active texture unit
     glUniform1i( glGetUniformLocation(program, "texture"), 0 );
     glBindTexture(GL_TEXTURE_2D, texture);
-
 }
 
 

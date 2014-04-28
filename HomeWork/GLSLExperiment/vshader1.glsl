@@ -6,7 +6,9 @@ out vec2 texCoord;
 
 
 in  vec4 vPosition;
-//in  vec4 vColor; //deprecated
+in  vec3 vNormal;
+
+
 out vec4 interpolatedColor; //deprecated
 uniform vec4 fragmentShaderLineColor;
 

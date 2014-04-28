@@ -34,6 +34,8 @@ typedef struct {
 	MyPolyline* points; // holds points and number of points
 	vec3* triangles; // holds 3 numbers representing indecies of vertices
 	//vec4* colors; // could hold color data
+	MyPoint* vertices;
+	vec3* normals; // normal vectors
 	vec3 max;
 	vec3 min;
 } PLYPicture;
@@ -141,6 +143,8 @@ PLYPicture* generateEmptyPLYPicture(GLint numVertices, GLint numTriangles);
 void drawPLYPicture(PLYPicture* p);
 void drawPLYPicture3(PLYPicture* p);
 PLYPicture* generatePLYCube(void);
+MyPoint* assembleVertices(PLYPicture* p);
+
 
 // MyTexture.cpp
 void setTextureStatus(int toSet);
