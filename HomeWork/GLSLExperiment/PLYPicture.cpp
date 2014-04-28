@@ -142,19 +142,39 @@ void drawPLYPicture3(PLYPicture* p){
 	int numPoints = p->numTriangles*3;
 	int sizePoints = numPoints*sizeof(MyPoint);
 	int sizeColors = numPoints*sizeof(color4);
-		
+	int sizeNormals = numPoints*sizeof(vec3);
+
 	// Preparing Data
 	MyPoint* points  = p->vertices;
 	vec3*    normals = p->normals;
 
-	// Prepare buffer
-    glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
+    // Prepare buffer
+    glBufferData( GL_ARRAY_BUFFER, sizePoints + sizeNormals,  NULL, GL_STATIC_DRAW );
 	
+	// Buffering data  // ACTUALLY SENDS DATA
+	glBufferSubData( GL_ARRAY_BUFFER, 0,           sizePoints, points );
+	glBufferSubData( GL_ARRAY_BUFFER, sizePoints, sizeNormals, normals );
+
+	// set up vertex arrays
+    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( vPosition );
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
+
+    GLuint vNormal = glGetAttribLocation( program, "vNormal" ); 
+    glEnableVertexAttribArray( vNormal );
+    glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(sizePoints) );
+	
+	/*
+	glBufferData( GL_ARRAY_BUFFER, sizePoints ,  points, GL_STATIC_DRAW );
+	
+
+
+
 	// Have to do this every time...
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
     glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,   BUFFER_OFFSET(0) );
-
+	*/
 
 }
 
