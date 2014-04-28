@@ -6,7 +6,7 @@
 vec4 AmbientProduct  = vec4(0.2, 0.2, 0.2, 1.0);
 vec4 DiffuseProduct  = vec4(1.0, 0.8, 0.0, 1.0);
 vec4 SpecularProduct = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 LightPosition   = vec4(1.0, 2.0, 3.0, 1.0);
+vec4 LightPosition   = vec4(1.0, 125.0, 3.0, 1.0);
 GLfloat shininess = 100.0f; // 100 default
 
 
@@ -36,7 +36,7 @@ void randomizeLighting(void){
 	AmbientProduct  = RAND_F_VEC4;
 	DiffuseProduct  = RAND_F_VEC4;
 	SpecularProduct = RAND_F_VEC4;
-	LightPosition   = RAND_F_VEC4;	 
+	//LightPosition   = RAND_F_VEC4;	 
 	shininess = (GLfloat) rand();
 }
 
@@ -50,7 +50,7 @@ void setShadowStatus(int status){
 void initShadows(void){
 	shadowProjection = Angel::identity();
 	shadowProjection[3][1] = -1.0/LightPosition.y;
-	//shadowProjection[3][3] = 0;
+	shadowProjection[3][3] = 0;
 	printm(shadowProjection);
 	int sign = 1;
 	shadowProjection = Translate(LightPosition.x *sign , LightPosition.y*sign, LightPosition.z*sign)*shadowProjection*Translate(LightPosition.x*-sign, LightPosition.y*-sign, LightPosition.z*-sign);

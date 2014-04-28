@@ -23,10 +23,13 @@ PLYPicture pics[9];       // 9 pictures pre-loaded
 mat4 staticTransforms[9]; // static transforms for each layer
 mat4 staticScales[9]; // because scale last
 GLfloat links[9];  // coordinate of top of link
+mat4 shadowHeight[9];
+
 
 // Tuning Constants
-#define MESH_Y_ROT_INC 0.5f
-#define SINUSOID_INC   0.1f
+GLfloat MESH_Y_ROT_INC  = 0.05f;
+GLfloat SINUSOID_INC =  0.01f;
+
 #define SINUSOID_AMP   0.25f
 #define ROTATION_INCREMENT    2.0 // degrees
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
@@ -56,7 +59,7 @@ void drawAPic(GLint n){
 	// Shadows!   
 	if (shadowMode){
 		setLightingStatus(FALSE);
-		nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
+		nextMat = peekMatrix()*shadowHeight[n]*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
 		sendMat4ToShader("CTM", nextMat);
 		setColor(0); // 0 = black
 		glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
@@ -195,6 +198,18 @@ void keyboard3( unsigned char key, int x, int y )
 		printf("Randomizing lighting settings...\n\n Good luck!\n");
 		randomizeLighting();
 		break;
+	
+	case 'G':
+		printf("Fast mode!\n");
+		MESH_Y_ROT_INC  = 0.5f;
+		SINUSOID_INC =  0.1f;
+		
+		break;
+	case 'g':
+		printf("Slooowwww mode...\n");
+		MESH_Y_ROT_INC  = 0.05f;
+		SINUSOID_INC =  0.01f;
+		break;
 
 
 	case 's':
@@ -291,47 +306,58 @@ void initPLYPictures(void){
 		staticScales[i] =  scaleToFitWindow*Scale(.2); // Maybe have them bigger?
 	}
 
+	// Shadow ground plane height
+	GLfloat shadowGroundOffset = 0.32f;
+
 	// Top layer
 	staticTransforms[0] = Translate(0,0,0); // moved to top
 	links[0] = 0;
+	shadowHeight[0] = Translate(0, -1.6 + shadowGroundOffset,0);
+
 
 	// 2nd layer - all have parent of 0
 	float rotationRadius = .65;
 	staticTransforms[1] =    Translate(rotationRadius*.5,-.3,0);
 	staticScales[1] *= Scale(.75); // foot
+	shadowHeight[1] = Translate(0, -1.3+ shadowGroundOffset,0);
 	links[1] = -rotationRadius*.5;
 	staticTransforms[8] =    Translate(-rotationRadius*.5,-.3,0);
 	staticScales[8] *= Scale(1.5); // stratocaster
 	links[8] = rotationRadius;
-
+	shadowHeight[8] = Translate(0, -1.3+ shadowGroundOffset,0);
 
 	// 3rd layer parent = 1
 	rotationRadius *= .5;
 	staticTransforms[2] = Translate(rotationRadius,-.3,0); 
 	staticScales[2] *= Scale(.65); // tennishoe	
+	shadowHeight[2] = Translate(0, -1.0+ shadowGroundOffset,0);
 	links[2] = -rotationRadius;
 	staticTransforms[3] = Translate(-rotationRadius, -.3,0);
 	staticScales[3] *= Scale(.5); // ant
 	links[3] = rotationRadius;
+	shadowHeight[3] = Translate(0, -1.0+ shadowGroundOffset,0);
 
 	// 4th layer - parent = 3
 	rotationRadius *= .4;
 	staticTransforms[7] = Translate(rotationRadius,-.3,0);
 	staticScales[7] *= Scale(.4); // urn
+	shadowHeight[7] = Translate(0, -0.7+ shadowGroundOffset,0);
 	links[7] = -rotationRadius;
 	staticTransforms[4] = Translate(-rotationRadius,-.3,0);
 	staticScales[4] *= Scale(.4); // beethoven
 	links[4] = rotationRadius;
+	shadowHeight[4] = Translate(0, -0.7+ shadowGroundOffset,0);
 
 	// 5th layer - parent = 4
 	//rotationRadius *= .5;
 	staticTransforms[5] = Translate(rotationRadius,-.3,0);
 	staticScales[5] *= Scale(.6); // sandal
+	shadowHeight[5] = Translate(0, -0.40+ shadowGroundOffset,0);
 	links[5] = -rotationRadius;
 	staticTransforms[6] = Translate(-rotationRadius,-.3,0);
 	staticScales[6] *= Scale(.7);// hammerhead
 	links[6] = rotationRadius;
-
+	shadowHeight[6] = Translate(0, -0.40+ shadowGroundOffset,0);
 
 	// Connecting Links
 	pts[0] = MyPoint(0,0,0,1);
@@ -352,7 +378,7 @@ int HW3( int argc, char **argv )
 	
 	// Texture Shit
 	setTextureStatus(FALSE);
-	initTexture("textures/stones.bmp");
+	initTexture("textures/grass.bmp");
 	
 	// Shadows
 	initShadows();
