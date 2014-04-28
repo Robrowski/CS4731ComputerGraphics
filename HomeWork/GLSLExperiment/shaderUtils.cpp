@@ -20,6 +20,9 @@ void sendIntToShader(char* variable, int toSet){
 	glUniform1i( glGetUniformLocation(program, variable), toSet );
 }
 
+void sendFloatToShader(char* variable, float toSet){
+	glUniform1f( glGetUniformLocation(program, variable), toSet );
+}
 
 
 

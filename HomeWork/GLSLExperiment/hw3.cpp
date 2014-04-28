@@ -31,10 +31,15 @@ GLfloat links[9];  // coordinate of top of link
 #define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
 
+// Connecting Links
+MyPoint pts[4];
+
 
 // Helper to draw a pic by number - handles relative transformations
 // Pushes current transformation and assumes previous + camera are on stack
 void drawAPic(GLint n){
+	setLightingStatus(TRUE);
+	
 	drawPLYPicture3(&pics[n]); // someday swap this out to just swap VBO's
 	mat4 sinusoidTrans = Translate(0,sin(sinusoidModeAngle)*SINUSOID_AMP ,0);
 
@@ -47,14 +52,11 @@ void drawAPic(GLint n){
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
 
 	// Drawing Connecting links
-	MyPoint pts[4];
-	pts[0] = MyPoint(0,0,0,1);
-	pts[1] = MyPoint(0,.3,0,1);
-	pts[2] = MyPoint(0,.3,0,1);
 	pts[3] = MyPoint(links[n],.3,0,1);
 	
 	// Draw links, but not for the top one.
 	if (n > 0){
+		setLightingStatus(FALSE);
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(pts) ,  pts, GL_STATIC_DRAW );
 	
@@ -69,6 +71,7 @@ void drawAPic(GLint n){
 
 	// Handy place to draw extents
 	if (extentMode){
+		setLightingStatus(FALSE);
 		sendMat4ToShader("CTM", peekMatrix()*staticScales[n]*sinusoidTrans);
 		MyPoint points[24];
 		MyPoint max = pics[n].max;
@@ -112,6 +115,10 @@ void drawAPic(GLint n){
 // ASSUME GPU BUFFERS ARE ALREADY LOADED
 void display3( void )
 {
+	// Update lighting crap
+	sendLightingConstants();
+
+
 	// set up projection matricies
 	glEnable( GL_DEPTH_TEST );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
@@ -127,7 +134,9 @@ void display3( void )
 	/**********************************************************************
 	Drawing the GRound Plane
 	***********************************************************************/
+	setLightingStatus(FALSE);
 	drawGroundPlane();
+	
 
 	/*****************************************************************
 		DRAWING THE MATRIX STACK
@@ -288,6 +297,12 @@ void initPLYPictures(void){
 	staticTransforms[6] = Translate(-rotationRadius,-.3,0);
 	staticScales[6] *= Scale(.7);// hammerhead
 	links[6] = rotationRadius;
+
+
+	// Connecting Links
+	pts[0] = MyPoint(0,0,0,1);
+	pts[1] = MyPoint(0,.3,0,1);
+	pts[2] = MyPoint(0,.3,0,1);
 }
 
 

@@ -164,12 +164,17 @@ mat4 peekMatrix(void);
 mat4 popMatrix(void);
 void resetMatrixStack(void);
 
+//lighting.cpp
+void setLightingStatus(int status);
+void changeShininess(GLfloat toSet);
+void sendLightingConstants(void);
 
 
 // shaderUtils.cpp
 void sendVec4ToShader(char* variable, vec4 toSet);
 void sendIntToShader(char* variable, int toSet);
 void sendMat4ToShader(char* variable, mat4 matrix);
+void sendFloatToShader(char* variable, float toSet);
 
 // camera.cpp
 mat4 getCamera(void);
