@@ -15,6 +15,7 @@ GLfloat meshYRotate = 0;
 // Modes
 bool extentMode = false;
 bool sinusoidMode = false;
+bool shadowMode = false;
 GLfloat sinusoidModeAngle = 0;
 
 // Pre-loaded pictures and static transforms
@@ -53,17 +54,18 @@ void drawAPic(GLint n){
 
 
 	// Shadows!   
-	
-	setLightingStatus(FALSE);
-	nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
-	sendMat4ToShader("CTM", nextMat);
-	setColor(0); // 0 = black
-	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
-	
+	if (shadowMode){
+		setLightingStatus(FALSE);
+		nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
+		sendMat4ToShader("CTM", nextMat);
+		setColor(0); // 0 = black
+		glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
+	}
 
 
 
 	// Drawing Connecting links
+	setColor(n);
 	pts[3] = MyPoint(links[n],.3,0,1);
 	
 	// Draw links, but not for the top one.
@@ -229,6 +231,7 @@ void keyboard3( unsigned char key, int x, int y )
 	case 'A':
 	case 'a':
 		printf("Toggling Shadows\n");
+		shadowMode = !shadowMode;
 		break;
 
 	case 'B':

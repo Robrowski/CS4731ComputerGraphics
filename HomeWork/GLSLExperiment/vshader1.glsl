@@ -29,7 +29,7 @@ out vec4 interpolatedColor;
 
 void main() 
 {
-	gl_Position = CTM*vPosition;
+  gl_Position = CTM*vPosition;
   
   texCoord = vPosition.xz;
 

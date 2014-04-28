@@ -37,8 +37,6 @@ void randomizeLighting(void){
 	DiffuseProduct  = RAND_F_VEC4;
 	SpecularProduct = RAND_F_VEC4;
 	LightPosition   = RAND_F_VEC4;	 
-
-
 	shininess = (GLfloat) rand();
 }
 
@@ -52,9 +50,11 @@ void setShadowStatus(int status){
 void initShadows(void){
 	shadowProjection = Angel::identity();
 	shadowProjection[3][1] = -1.0/LightPosition.y;
-	shadowProjection = Translate(LightPosition.x, LightPosition.y, LightPosition.z)*shadowProjection*Translate(-LightPosition.x, -LightPosition.y, -LightPosition.z);
-
-	
+	//shadowProjection[3][3] = 0;
+	printm(shadowProjection);
+	int sign = 1;
+	shadowProjection = Translate(LightPosition.x *sign , LightPosition.y*sign, LightPosition.z*sign)*shadowProjection*Translate(LightPosition.x*-sign, LightPosition.y*-sign, LightPosition.z*-sign);
+	printm(shadowProjection);
 }
 
 mat4 getShadowProjection(void){
