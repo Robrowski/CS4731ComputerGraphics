@@ -14,6 +14,9 @@ uniform vec4 AmbientProduct, DiffuseProduct, SpecularProduct;
 uniform vec4 LightPosition;
 uniform float Shininess;
 
+// Shadowing
+//uniform int isShadow;
+//uniform mat4 ShadowProjection;
 
 // In to this (vertex Shader)
 in  vec4 vPosition;
@@ -26,7 +29,8 @@ out vec4 interpolatedColor;
 
 void main() 
 {
-  gl_Position = CTM*vPosition;
+	gl_Position = CTM*vPosition;
+  
   texCoord = vPosition.xz;
 
   interpolatedColor = fragmentShaderLineColor;

@@ -169,6 +169,12 @@ void setLightingStatus(int status);
 void changeShininess(GLfloat toSet);
 void sendLightingConstants(void);
 void randomizeLighting(void);
+void setShadowStatus(int status);
+void initShadows(void);
+mat4 getShadowProjection(void);
+
+
+
 
 // shaderUtils.cpp
 void sendVec4ToShader(char* variable, vec4 toSet);

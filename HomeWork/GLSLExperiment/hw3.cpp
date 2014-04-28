@@ -51,12 +51,23 @@ void drawAPic(GLint n){
 	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
 
+
+	// Shadows!   
+	
+	setLightingStatus(FALSE);
+	nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
+	sendMat4ToShader("CTM", nextMat);
+	setColor(0); // 0 = black
+	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
+	
+
+
+
 	// Drawing Connecting links
 	pts[3] = MyPoint(links[n],.3,0,1);
 	
 	// Draw links, but not for the top one.
 	if (n > 0){
-		setLightingStatus(FALSE);
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(pts) ,  pts, GL_STATIC_DRAW );
 	
@@ -71,7 +82,6 @@ void drawAPic(GLint n){
 
 	// Handy place to draw extents
 	if (extentMode){
-		setLightingStatus(FALSE);
 		sendMat4ToShader("CTM", peekMatrix()*staticScales[n]*sinusoidTrans);
 		MyPoint points[24];
 		MyPoint max = pics[n].max;
@@ -139,7 +149,7 @@ void display3( void )
 
 	/*****************************************************************
 		DRAWING THE MATRIX STACK
-	******************************************************************/
+	*****************************************************************/
 	// Draw each mesh using the matrix stack	
 	drawAPic(0 );// layer 1
 	pushMatrix( peekMatrix()*RotateY(meshYRotate*1.05));
@@ -341,7 +351,8 @@ int HW3( int argc, char **argv )
 	setTextureStatus(FALSE);
 	initTexture("textures/stones.bmp");
 	
-	
+	// Shadows
+	initShadows();
 
 	// Starting points and vector
 	initCamera();

@@ -40,9 +40,27 @@ void randomizeLighting(void){
 
 
 	shininess = (GLfloat) rand();
-
-
 }
+
+
+// Now for shadows
+mat4 shadowProjection;
+void setShadowStatus(int status){
+	sendIntToShader( "isShadow", status );
+}
+
+void initShadows(void){
+	shadowProjection = Angel::identity();
+	shadowProjection[3][1] = -1.0/LightPosition.y;
+	shadowProjection = Translate(LightPosition.x, LightPosition.y, LightPosition.z)*shadowProjection*Translate(-LightPosition.x, -LightPosition.y, -LightPosition.z);
+
+	
+}
+
+mat4 getShadowProjection(void){
+	return shadowProjection;
+}
+
 
 
 
