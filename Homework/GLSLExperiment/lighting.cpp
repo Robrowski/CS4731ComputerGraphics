@@ -7,7 +7,7 @@ vec4 AmbientProduct  = vec4(0.2, 0.2, 0.2, 1.0);
 vec4 DiffuseProduct  = vec4(1.0, 0.8, 0.0, 1.0);
 vec4 SpecularProduct = vec4(1.0, 1.0, 1.0, 1.0);
 vec4 LightPosition   = vec4(1.0, 2.0, 3.0, 1.0);
-float shininess = 100.0f; // 100 default
+GLfloat shininess = 100.0f; // 100 default
 
 
 void changeShininess(GLfloat toSet){
@@ -28,7 +28,21 @@ void sendLightingConstants(void){
 	sendFloatToShader("Shininess", shininess);
 }
 
+#define RAND_F (GLfloat) 1.0*rand()/RAND_MAX
+#define RAND_F_VEC4 vec4(RAND_F,RAND_F,RAND_F, 1.0)
 
+void randomizeLighting(void){
+
+	AmbientProduct  = RAND_F_VEC4;
+	DiffuseProduct  = RAND_F_VEC4;
+	SpecularProduct = RAND_F_VEC4;
+	LightPosition   = RAND_F_VEC4;	 
+
+
+	shininess = (GLfloat) rand();
+
+
+}
 
 
 

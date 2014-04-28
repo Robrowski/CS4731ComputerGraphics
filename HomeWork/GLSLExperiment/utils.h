@@ -168,7 +168,7 @@ void resetMatrixStack(void);
 void setLightingStatus(int status);
 void changeShininess(GLfloat toSet);
 void sendLightingConstants(void);
-
+void randomizeLighting(void);
 
 // shaderUtils.cpp
 void sendVec4ToShader(char* variable, vec4 toSet);

@@ -118,7 +118,6 @@ void display3( void )
 	// Update lighting crap
 	sendLightingConstants();
 
-
 	// set up projection matricies
 	glEnable( GL_DEPTH_TEST );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
@@ -180,6 +179,12 @@ void keyboard3( unsigned char key, int x, int y )
 		printf("Not Implemented! \n");
 		break;
 
+	case 'f':
+		printf("Randomizing lighting settings...\n\n Good luck!\n");
+		randomizeLighting();
+		break;
+
+
 	case 's':
 	case 'S':
 		sinusoidMode = !sinusoidMode;
@@ -211,9 +216,25 @@ void keyboard3( unsigned char key, int x, int y )
 		initCamera();
 		break;
 
+	case 'A':
+	case 'a':
+		printf("Toggling Shadows\n");
+		break;
+
 	case 'B':
 	case 'b':
+		printf("Toggling ground plane\n");
 		toggleGroundPlane();
+		break;
+
+	case 'C':
+	case 'c':
+		printf("Toggling reflection\n");
+		break;
+
+	case 'D':
+	case 'd':
+		printf("Toggling refraction\n");
 		break;
 
 	// Quit commands
