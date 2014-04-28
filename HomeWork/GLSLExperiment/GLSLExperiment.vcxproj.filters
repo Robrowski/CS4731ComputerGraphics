@@ -32,18 +32,15 @@
     <Filter Include="textures">
       <UniqueIdentifier>{3c38aee7-48c2-4e7d-8018-43ecdebd53dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ShaderUtils">
+      <UniqueIdentifier>{09d04bbc-35ec-4e8b-86e5-191dd4a2089e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="InitShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="geometries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keys.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="init.cpp">
@@ -70,9 +67,6 @@
     <ClCompile Include="hw2.cpp">
       <Filter>Source Files\Homework</Filter>
     </ClCompile>
-    <ClCompile Include="shaderUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GRS.cpp">
       <Filter>Source Files\FileReaders</Filter>
     </ClCompile>
@@ -97,7 +91,22 @@
     <ClCompile Include="example1.cpp">
       <Filter>Source Files\Homework</Filter>
     </ClCompile>
+    <ClCompile Include="InitShader.cpp">
+      <Filter>Source Files\ShaderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>Source Files\ShaderUtils</Filter>
+    </ClCompile>
     <ClCompile Include="MyTexture.cpp">
+      <Filter>Source Files\ShaderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderUtils.cpp">
+      <Filter>Source Files\ShaderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting.cpp">
+      <Filter>Source Files\ShaderUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
       <Filter>Source Files\Abstractions</Filter>
     </ClCompile>
   </ItemGroup>

@@ -39,6 +39,9 @@ typedef struct {
 } PLYPicture;
 
 
+// Constants
+#define DEG_TO_RAD          M_PI/180
+
 
 // Program locations
 extern GLuint program;
@@ -156,6 +159,22 @@ void pushMatrix(mat4 m);
 mat4 peekMatrix(void);
 mat4 popMatrix(void);
 void resetMatrixStack(void);
+
+
+
+// shaderUtils.cpp
+void sendVec4ToShader(char* variable, vec4 toSet);
+void sendIntToShader(char* variable, int toSet);
+void sendMat4ToShader(char* variable, mat4 matrix);
+
+// camera.cpp
+mat4 getCamera(void);
+void MySetModelViewMatrix(void);
+void MySlide(float dU, float dV, float dN);
+void MyRoll(float angle);
+void MyYaw(float angle);
+void MyPitch(float angle);
+void initCamera(void);
 
 
 // hw1.cpp

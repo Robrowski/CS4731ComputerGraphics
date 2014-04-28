@@ -5,12 +5,13 @@ uniform int useTexture;
 in  vec2 texCoord;
 uniform sampler2D texture;
 
-uniform vec4 fragmentShaderLineColor;
 out vec4  fColor;
+in vec4 interpolatedColor;
+
 
 void main() 
 { 
-	fColor = fragmentShaderLineColor;
+	fColor = interpolatedColor;
 
 	if (useTexture == 1){
 		fColor = texture2D( texture, texCoord );

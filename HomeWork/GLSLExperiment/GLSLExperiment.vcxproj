@@ -82,6 +82,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bmpread.c" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="example1.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="keys.cpp" />
     <ClCompile Include="init.cpp" />
     <ClCompile Include="InitShader.cpp" />
+    <ClCompile Include="lighting.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrixStack.cpp" />
     <ClCompile Include="MyPicture.cpp" />

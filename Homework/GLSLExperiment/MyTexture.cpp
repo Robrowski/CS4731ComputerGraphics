@@ -12,19 +12,20 @@ GLint groundPlaneState = GRASS;
 
 
 
+GLint inc = 10;
  
 MyPoint groundPlane[6] = {
-	MyPoint( -4.0, -2, 0.0, 1.0 ),
-	MyPoint( -4.0, -2, -8.0, 1.0 ),
-	MyPoint( 4.0, -2, -8.0, 1.0 ),
-	MyPoint( 4.0, -2, -8.0,  1.0 ),
-	MyPoint( 4.0, -2, 0.0, 1.0 ),
-	MyPoint( -4.0, -2, 0.0, 1.0 )
+	MyPoint( -inc, -2,  inc , 1.0 ),
+	MyPoint( -inc, -2, -inc, 1.0 ),
+	MyPoint( inc, -2, -inc, 1.0 ),
+	MyPoint( inc, -2, -inc,  1.0 ),
+	MyPoint( inc, -2,  inc, 1.0 ),
+	MyPoint( -inc, -2, inc, 1.0 )
     };
 
 // Sends teh given color vector to the fragment shader for colorizing
-void setTextureStatus(int toSet){
-	glUniform1i( glGetUniformLocation(program, "useTexture"), toSet );
+void setTextureStatus(int toSet){  
+	sendIntToShader( "useTexture", toSet );
 }
 
 void toggleGroundPlane(void){
@@ -39,6 +40,7 @@ void toggleGroundPlane(void){
 
 }
 
+// Assumes ONLY camera is in CTM
 void drawGroundPlane(void){
 	setTextureStatus(TRUE);
 
