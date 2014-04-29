@@ -60,11 +60,13 @@ void drawAPic(GLint n){
 
 	// Shadows!   
 	if (shadowMode){
+		sendIntToShader("isShadow", 1);
 		setLightingStatus(FALSE);
 		nextMat = peekMatrix()*shadowHeight[n]*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans*getShadowProjection();
 		sendMat4ToShader("CTM", nextMat);
 		setColor(0); // 0 = black
 		glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
+		sendIntToShader("isShadow", 0);
 	}
 
 

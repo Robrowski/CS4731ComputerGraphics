@@ -7,6 +7,9 @@ uniform int useTexture;
 in  vec2 texCoord;
 uniform sampler2D textureGround;
 
+uniform int isShadow;
+
+
 // Cube shit
 uniform samplerCube texMap;
 in vec3 R;
@@ -18,9 +21,10 @@ in vec4 interpolatedColor;
 
 void main() 
 { 
-
-
-	if (useTexture == 1){  // If ground
+	
+	if (isShadow == 1){
+		fColor = interpolatedColor;
+	} else if (useTexture == 1){  // If ground
 		fColor = texture2D( textureGround, texCoord );
 	} else if (reflectMode == 1){ // If reflection Mode
 		fColor = texture(texMap, R);

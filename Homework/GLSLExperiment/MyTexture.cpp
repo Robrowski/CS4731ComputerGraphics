@@ -114,16 +114,12 @@ void initTextureCube(void){
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-
-
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_X, "textures/nvposx.bmp"  );
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "textures/nvnegx.bmp"  );
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "textures/nvposy.bmp"  );
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "textures/nvnegy.bmp"  );
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "textures/nvposz.bmp"  );
 	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "textures/nvnegz.bmp"  );
-
-
 
 	glTexParameteri( GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri (GL_TEXTURE_CUBE_MAP , GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -132,13 +128,6 @@ void initTextureCube(void){
 
 	// Sets up for use with fragment shader?
 	sendIntToShader( "texMap",1); // corresponding to unit 1 - not sure what the 1 signifies
-
-
-
-
-
-
-
 }
 
 
