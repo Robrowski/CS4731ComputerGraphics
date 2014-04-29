@@ -131,7 +131,7 @@ void initTextureCube(void){
 
 
 	// Sets up for use with fragment shader?
-	sendIntToShader( "texMap", tex[0]); // corresponding to unit 1 - not sure what the 1 signifies
+	sendIntToShader( "texMap",1); // corresponding to unit 1 - not sure what the 1 signifies
 
 
 
