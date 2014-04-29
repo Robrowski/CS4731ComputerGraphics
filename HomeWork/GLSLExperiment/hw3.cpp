@@ -13,6 +13,8 @@ using namespace std;
 GLfloat meshYRotate = 0;
 
 // Modes
+bool reflectMode = false;
+bool refractMode = false;
 bool extentMode = false;
 bool sinusoidMode = false;
 bool shadowMode = false;
@@ -258,11 +260,19 @@ void keyboard3( unsigned char key, int x, int y )
 	case 'C':
 	case 'c':
 		printf("Toggling reflection\n");
+		reflectMode = !reflectMode;
+		refractMode = false;
+		sendIntToShader("reflectMode", reflectMode);
+		sendIntToShader("refractMode", refractMode);
 		break;
 
 	case 'D':
 	case 'd':
 		printf("Toggling refraction\n");
+		reflectMode = false;
+		refractMode = !refractMode;
+		sendIntToShader("reflectMode", reflectMode);
+		sendIntToShader("refractMode", refractMode);
 		break;
 
 	// Quit commands
@@ -379,6 +389,9 @@ int HW3( int argc, char **argv )
 	// Texture Shit
 	setTextureStatus(FALSE);
 	initTexture("textures/grass.bmp");
+	initTextureCube();
+	sendIntToShader("reflectMode", reflectMode);
+	sendIntToShader("refractMode", refractMode);
 	
 	// Shadows
 	initShadows();

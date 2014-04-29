@@ -79,12 +79,67 @@ void initTexture(char* file){
 
 
 	// Set our texture samples to the active texture unit
-    glUniform1i( glGetUniformLocation(program, "texture"), 0 );
+    glUniform1i( glGetUniformLocation(program, "textureGround"), 0 );
     glBindTexture(GL_TEXTURE_2D, texture);
 }
 
 
 
+
+void loadTextureToCube(GLenum target, char* file){
+	printf("Loading the %s texture\n", file);
+
+	if(!bmpread(file, 0, &bitmap))
+	{
+		fprintf(stderr, "%s:error loading bitmap file\n", file);
+		exit(1);
+	}
+		
+	glTexImage2D(target, 0, GL_RGB,bitmap.width, bitmap.height, 0, GL_RGB,GL_UNSIGNED_BYTE, bitmap.rgb_data);
+	bmpread_free(&bitmap);
+}
+
+GLuint tex[1];
+
+
+void initTextureCube(void){
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex[0]);
+
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+
+
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_X, "textures/nvposx.bmp"  );
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "textures/nvnegx.bmp"  );
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "textures/nvposy.bmp"  );
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "textures/nvnegy.bmp"  );
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "textures/nvposz.bmp"  );
+	loadTextureToCube(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "textures/nvnegz.bmp"  );
+
+
+
+	glTexParameteri( GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP , GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+
+
+	// Sets up for use with fragment shader?
+	sendIntToShader( "texMap", tex[0]); // corresponding to unit 1 - not sure what the 1 signifies
+
+
+
+
+
+
+
+}
 
 
 

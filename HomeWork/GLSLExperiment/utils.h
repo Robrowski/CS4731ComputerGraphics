@@ -151,6 +151,7 @@ void setTextureStatus(int toSet);
 void initTexture(char* file);
 void drawGroundPlane(void);
 void toggleGroundPlane(void);
+void initTextureCube(void);
 
 // draw.cpp
 void drawFern(int iterations);
@@ -204,6 +205,14 @@ void drawQuadrants(int X, int Y, int width, int height, int numRecursions,MyPict
 	#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+
+
+// Modes
+extern bool reflectMode;
+extern bool refractMode;
+extern bool extentMode;
+extern bool sinusoidMode;
+extern bool shadowMode;
 
 
 #endif // UTILS_H
