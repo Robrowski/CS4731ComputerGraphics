@@ -41,20 +41,14 @@ void main()
 		vec3 N = normalize(NN.xyz);
 		
 		R = reflect(eyePos, N);
-	}
-	
-	if (refractMode == 1){
+	} else if (refractMode == 1){
 		vec4 eyePos = vPosition; 
 		vec4 normal = vec4(vNormal.x, vNormal.y, vNormal.z, 0);
 		vec4 NN = CTM*normal; 
 		vec3 N =normalize(NN.xyz); 
 		
 		T = refract(eyePos.xyz, N, 1); 				
-	}
-	
-	
-	// Blegh lighting
-	if (useLighting == 1){
+	} else if (useLighting == 1){// Blegh lighting
 		// Transform vertex position into eye coordinates
 		vec3 pos = (CTM * vPosition).xyz; /// My CTM include projection...
 		vec3 L = normalize( LightPosition.xyz - pos );

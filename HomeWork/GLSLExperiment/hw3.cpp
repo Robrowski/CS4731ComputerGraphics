@@ -7,8 +7,6 @@
 using namespace std;
 //----------------------------------------------------------------------------
 
-
-
 // The degrees each mesh should have turned
 GLfloat meshYRotate = 0;
 
@@ -27,19 +25,17 @@ mat4 staticScales[9]; // because scale last
 GLfloat links[9];  // coordinate of top of link
 mat4 shadowHeight[9];
 
-
 // Tuning Constants
 GLfloat MESH_Y_ROT_INC  = 0.05f;
 GLfloat SINUSOID_INC =  0.01f;
 
 #define SINUSOID_AMP   0.25f
 #define ROTATION_INCREMENT    2.0 // degrees
-#define CAM_ROT_INC                (-1)*ROTATION_INCREMENT// degrees
+#define CAM_ROT_INC    (-1)*ROTATION_INCREMENT// degrees
 #define SLIDE_INC .01
 
 // Connecting Links
 MyPoint pts[4];
-
 
 // Helper to draw a pic by number - handles relative transformations
 // Pushes current transformation and assumes previous + camera are on stack
@@ -54,7 +50,6 @@ void drawAPic(GLint n){
 	mat4 nextMat = peekMatrix()*RotateY(meshYRotate*(n*.4 + 0.1))*staticScales[n]*sinusoidTrans;
 	sendMat4ToShader("CTM", nextMat);
 	
-	setColor(n);
 	glDrawArrays( GL_TRIANGLES, 0, pics[n].numPointsInPicture ); 
 
 
@@ -69,14 +64,10 @@ void drawAPic(GLint n){
 		sendIntToShader("isShadow", 0);
 	}
 
-
-
-	// Drawing Connecting links
-	setColor(n);
-	pts[3] = MyPoint(links[n],.3,0,1);
-	
 	// Draw links, but not for the top one.
 	if (n > 0){
+		pts[3] = MyPoint(links[n],.3,0,1);
+		
 		// Prepare buffer
 		glBufferData( GL_ARRAY_BUFFER, sizeof(pts) ,  pts, GL_STATIC_DRAW );
 	
@@ -153,8 +144,7 @@ void display3( void )
 	Drawing the GRound Plane
 	***********************************************************************/
 	setLightingStatus(FALSE);
-	drawGroundPlane();
-	
+	drawGroundPlane();	
 
 	/*****************************************************************
 		DRAWING THE MATRIX STACK
@@ -170,8 +160,6 @@ void display3( void )
 			popMatrix();
 			drawAPic(3 );// other half of layer 3
 			pushMatrix( peekMatrix()*RotateY(meshYRotate));
-				/* Fewer objects so that the program runs faster
-				*/
 				drawAPic(7 );// layer 4
 				popMatrix();
 				drawAPic(4 );// other half of layer 4
@@ -180,10 +168,6 @@ void display3( void )
 					popMatrix();
 					drawAPic(6 );// other half of layer 5
 				
-
-
-
-
 	glDisable( GL_DEPTH_TEST ); 
 	glutSwapBuffers();
 }
@@ -214,7 +198,6 @@ void keyboard3( unsigned char key, int x, int y )
 		MESH_Y_ROT_INC  = 0.05f;
 		SINUSOID_INC =  0.01f;
 		break;
-
 
 	case 's':
 	case 'S':
@@ -278,6 +261,7 @@ void keyboard3( unsigned char key, int x, int y )
 		break;
 
 	// Quit commands
+	case 'Q':
 	case 'q':
 	case 033:
         exit( EXIT_SUCCESS );
@@ -387,26 +371,22 @@ int HW3( int argc, char **argv )
 	initPLYPictures();
 	initMatrixStack(20); // extra big
 	
-	
-	// Texture Shit
+	// Texture 
 	setTextureStatus(FALSE);
 	initTexture("textures/grass.bmp");
 	initTextureCube();
-	sendIntToShader("reflectMode", reflectMode);
-	sendIntToShader("refractMode", refractMode);
-	
+
 	// Shadows
 	initShadows();
 
 	// Starting points and vector
 	initCamera();
 	
-
+	// Callbacks
     glutDisplayFunc( display3 );
     glutKeyboardFunc( keyboard3 );
 	glutIdleFunc(idleTransformations3);
 
     glutMainLoop();
-	
 	return 0;
 }

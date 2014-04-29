@@ -54,7 +54,6 @@ void drawGroundPlane(void){
 
 
 
-
 void initTexture(char* file){
 	printf("Loading the %s texture\n", file);
 
@@ -84,8 +83,6 @@ void initTexture(char* file){
 }
 
 
-
-
 void loadTextureToCube(GLenum target, char* file){
 	printf("Loading the %s texture\n", file);
 
@@ -100,9 +97,10 @@ void loadTextureToCube(GLenum target, char* file){
 }
 
 GLuint tex[1];
-
-
 void initTextureCube(void){
+	sendIntToShader("reflectMode", reflectMode);
+	sendIntToShader("refractMode", refractMode);
+
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	
 	glActiveTexture(GL_TEXTURE1);
@@ -129,19 +127,5 @@ void initTextureCube(void){
 	// Sets up for use with fragment shader?
 	sendIntToShader( "texMap",1); // corresponding to unit 1 - not sure what the 1 signifies
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
